@@ -1,0 +1,2196 @@
+%!TEX root = thesis.tex
+
+%:-------------------------- Preamble -----------------------
+
+% Three languages are supported, which will be reflected in the logo on the front page. Pass the appropriate language
+% specified as a class option to uit-thesis. Passing any other languages supported by babel will result in the default
+% language on the frontpage. If no language is passed, the default is selected.
+%  - USenglish (default)
+%  - norsk
+%  - samin
+% The frontpage comes in two variants, Master's thesis and PhD. Master is default, use classoption 'phd' for the PhD version.
+\documentclass[USenglish]{uit-thesis}
+
+%\usepackage{protobuf/lang}  % include language definition for protobuf
+%\usepackage{protobuf/style} % include custom style for proto declarations.
+
+\immediate\write18{makeglossaries -q "\jobname"}
+\makeglossaries
+
+%\usepackage[authoryear,round,longnamesfirst]{natbib}
+
+% Add external glossaryentries
+\loadglsentries{acronyms}
+\newacronym{api}{API}{application programming interface}\glsunset{api}
+\newacronym{2api}{2API}{application programming interface}
+\newacronym{d3}{D3}{Data-Driven Documents}
+\newacronym{html5}{HTML5}{version 5 of the HyperText Markup Language standard}
+\newacronym{tls}{TLS}{Transport Layer Security}
+\newacronym{ca}{CA}{Certificate Authority}
+\newacronym{p2p}{P2P}{Peer-to-Peer}
+\newacronym{dos}{DOS}{Denial of Service}
+\newacronym{ddos}{DDOS}{Distributed Denial of Service}
+\newacronym{grpc}{GRPC}{Google Remote Procedure Call}
+\newacronym{rpc}{RPC}{Remote Procedure Call}
+\newacronym{gzip}{GZIP}{GNU Zip}
+\newacronym{protobuf}{PROTOBUF}{Protocol Buffers}
+\newacronym{go}{GO}{Golang}
+\newacronym{dns}{DNS}{Domain Name System}
+\newacronym{tcp}{TCP}{Transmission Control Protocol}
+\newacronym{udp}{UDP}{User Datagram Protocol}
+\newacronym{rsa}{RSA}{Rivest–Shamir–Adleman}
+\newacronym{dsa}{DSA}{Digital Signature Algorithm}
+\newacronym{cpu}{CPU}{Central Processing Unit}
+\newacronym{os}{OS}{Operating System}
+\newacronym{gil}{GIL}{Global Interpretor Lock}
+\newacronym{tbb}{TBB}{Thread Building Blocks}
+\newacronym{icmp}{ICMP}{Internet Control Message Protocol}
+\newacronym{ip}{IP}{Internet Protocol}
+\newacronym{pos}{PoS}{Proof-Of-Stake}
+\newacronym{pow}{PoW}{Proof-Of-Work}
+\newacronym{bft}{BFT}{Byzantine Fault-Tolerance}
+\newacronym{smr}{SMR}{State Machine Replication}
+\newacronym{rtt}{RTT}{Round-Trip-Time}
+\newacronym{ba}{BA}{Byzantine Agreement}
+\newacronym{dag}{DAG}{Directed-Acyclic-Graph}
+\newacronym{vm}{VM}{Virtual Machine}
+\newacronym{http}{HTTP}{Hypertext Transfer Protocol}
+\newacronym{gb}{GB}{Gigabyte}
+\newacronym{mb}{MB}{Megabyte}
+\newacronym{kb}{KB}{Kilobyte}
+\newacronym{kbps}{KBPS}{kilobits Per Second}
+\newacronym{aws}{AWS}{Amazon Web Services}
+
+\usepackage{listings-golang} % import this package after listings
+\usepackage{color}
+
+\lstset{ % add your own preferences
+	frame=single,
+	basicstyle=\footnotesize,
+	keywordstyle=\color{blue},
+	numbers=left,
+	numbersep=5pt,
+	showstringspaces=false, 
+	stringstyle=\color{blue},
+	tabsize=4,
+	language=Golang % this is it !
+}
+
+
+
+
+%%% Erlend listings
+\DisableLigatures[f]{encoding = T1, family = SourceCodePro-TLF}
+% Default, common formatting of listings
+\lstset{%
+	% Special stuff:
+	escapeinside={\%*}{*)},
+	%
+	%
+	% Caption:
+	captionpos=t,% Show caption above listings
+	%
+	%
+	% Margin, padding, etc:
+	xleftmargin=8pt,%
+	xrightmargin=0pt,%
+	framexleftmargin=8pt,
+	framexrightmargin=0pt,
+	framexbottommargin=2pt,
+	aboveskip=0em,%
+	belowskip=0em,%
+	%
+	%
+	% Code formatting (font and colors):
+	basicstyle={\fontsize{7.5pt}{9pt}\usefont{T1}{SourceCodePro-TLF}{m}{n}\selectfont},% The first number in \fontsize{} is the size of the font, and the last number should be 1.2 times that (the line spacing)
+	backgroundcolor=\color[cmyk]{0,0,0,0},
+	%
+	%
+	% Nitty-gritty formatting stuff
+	columns=flexible,%
+	showtabs=false,%
+	showstringspaces=false,%
+	keepspaces=true,
+	%fontadjust=true,
+}
+\lstdefinestyle{nolinenumbers}{%
+	numbers=none,
+	xleftmargin=8pt,%
+	framexleftmargin=8pt,
+}
+
+\lstdefinestyle{linenumbers}{%
+	% Line numbers:
+	numbers=left,% Show line numbers on left side
+	numbersep=6pt,% Spacing between line numbers and code
+	numberstyle={\color[cmyk]{0,0.07,0.05,0.78}},% Formatting of line numbers
+	xleftmargin=18pt,%
+	framexleftmargin=18pt,
+}
+
+\lstdefinestyle{frame}{%
+	% Frame:
+	frame=b,% Show frame only below listing
+}
+\definecolor{codedefcolor}{cmyk}{0.6,0,0.1,0.2}
+
+\newcustomlstenvironment{codedefinition}{locodedef}{Code Listing}[1][]{
+	\lstset{%
+		%
+		%
+		language=Golang,
+		inputpath={./codelistings},
+		style=frame,
+		style=linenumbers,
+		%
+		% Colors:
+		rulecolor=\color{codedefcolor},% Frame color
+		rulesepcolor=\color{Gray},% Frame color used to separate two listings without vertical spacing in between
+		%
+		% Code formatting (font and colors):
+		commentstyle=\color[rgb]{0,0.5,0},%{\bfseries\color[cmyk]{0.95,0,0.52,0.52}},
+		stringstyle={\color[rgb]{0.64,0.08,0.08}},% C strings, XXX
+		%directivestyle={\color[rgb]{0,0,1}},% Preprocessor directives, XXX
+		identifierstyle=\color[cmyk]{0,0.07,0.05,0.9},
+		keywordstyle=\color[rgb]{0,0,1},
+		keywordstyle=[2]{\color{pms7707}},
+		keywordstyle=[3]{\color[cmyk]{0.06,1,0,0.29}},
+		keywordstyle=[4]{\color[cmyk]{0.39,0.75,0,0.2}},
+	}
+	\lstset{#1}
+}{}
+\newlistof{codedefinition}{locodedef}{List of Code Listings}
+\floatstyle{plaintop} % optionally change the style of the new float
+\newfloat{code}{!tbph}{myc}
+\makeatletter
+\setlength{\textfloatsep}{2\baselineskip minus \baselineskip}
+\setlength{\intextsep}{1\baselineskip \@plus \baselineskip}
+\makeatother
+\DeclareCaptionFont{green}{\color{white!50!white}}
+\captionsetup[codedefinition]{labelfont={bf,green},textfont=green,box=colorbox,boxcolor={codedefcolor},margin=4pt,justification=justified,singlelinecheck=false}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{position=bottom}
+
+% States which fraction of the page a table or figure can consume before placed on an extra page (called a "float page")
+% Adjust this after what you think looks good!! 😀
+\renewcommand{\floatpagefraction}{0.72}
+%%% Erlend listings
+
+
+%\usepackage{listings}
+
+
+\newglossaryentry{thesis}
+{
+  name=thesis,
+  description={is a document submitted in support of candidature for an
+    academic degree or professional qualification presenting the author's
+    research and findings
+    },
+}
+\newglossaryentry{lage}
+{
+  name={long ass glossary entry},
+  description={is a long ass entry with a lot of text describing the properties of the glossary entry. Hopefully this spans some lines now.
+  },
+}
+
+\newcommand{\listdefinitionname}{My list of definitions}
+\newlistof{definition}{def}{\listdefinitionname}
+\newcommand{\definition}[1]{%
+  \refstepcounter{definition}%
+  \par\noindent\textbf{The Definition~\thedefinition. #1}%
+  \addcontentsline{def}{definition}
+    {\protect\numberline{\thechapter.\thedefinition}#1}\par%
+}
+
+%implementasjons kapitellan må være mer spesifik og ikke gjenta så mye det som allerede e etablert.
+%endre section tittla.
+
+%endre abstract og conclusjon, NU asap!
+
+%chap1: remake prob def
+%chap2: merge med related work, fjern redundant tekst
+%chap3: merge till background
+%chap4: Endre tittel "The Fireflies protocol"
+%chap5: Endre oppsett, section per component, mer sepsifikk, ikke gjenta så mye, referer til Ifrit
+% og ikke fireflies
+%chap6: Revamp det meste, system figure revamp og flytt til starten. Gjøre protoklen "min egen" (mer code listing av den etc). Mer spesifikt og retta mot implementasjon.
+%chap7: Flytt den siste diskusjons biten til conclusjon. Utfyll mer på experimentan, fiks grafan, merge litt planetlab greier, småpjusk.
+%chap8: fyll mer greier fra chap7 og re-introduser intro greier.
+
+
+\begin{document}
+
+%:-------------------------- Frontpage ------------------------
+
+\title{FireChain: An Efficient Blockchain Protocol using Secure Gossip}
+%\subtitle{Subtitle}			% Optional
+\author{Jon Foss Mikalsen}
+\thesisfaculty{Faculty of Science and Technology \\ Department of Computer Science}
+\thesisprogramme{Master Thesis-3981 in computer science \\ June 1 2018}
+%\ThesisFrontpageImage{chat.jpg}	% Optional
+
+%\maketitle
+
+%:-------------------------- Frontmatter -----------------------
+\frontmatter
+
+%\printglossaries
+
+
+\begin{epigraph}
+%\epigraphitem{"Chat shit get banged"}{Jamie Vardy}
+\epigraphitem{Alright im in low priority im just reporting everyone on sight you're all going down with me.}{Artour "Arteezy" Babaev}
+%\epigraphitem{I'm about to overdose on laxatives boys wish me luck.}{Artour "Arteezy" Babaev}
+\epigraphitem{There shall be no slides.}{Håvard D. Johansen}
+\epigraphitem{Har du sett racken hannes?}{Helge Hoff}
+\epigraphitem{There are no mistakes, just happy little accidents}{Bob Ross}
+\epigraphitem{Det e bare å ssh'e sæ inn i HTML5 koden og memlocke stacken!}{Eddie/Magga}
+\epigraphitem{We're playing for all the marbles!}{Unknown 4th grader}
+%\epigraphitem{Simplicity is prerequisite for reliability.}{Edsger Dijkstra}
+%\epigraphitem{Beware of bugs in the above code;\\I have only proved it correct, not tried it.}{Donald Knuth}
+\end{epigraph}
+
+\begin{abstract}
+%Bitcoin was released in 2009 and introduced blockchains
+Blockchains are becoming an increasingly popular technology, providing applications with a completely new platform of operation.
+Blockchains are often employed in crypto-currency systems, such as Bitcoin and Ethereum, where pseudo-anonymous parties engage in transactions without a trusted third party.
+Blockchain systems often struggle to meet performance demands of real-word applications, rendering them inappropriate for several use-cases.
+The majority of public blockchain systems consume immense amounts of energy, Bitcoin alone consumes more than small countries.
+Private systems have higher throughput and avoid excessive energy consumption, but have closed membership and do not scale to the same extent.
+
+%As with all distributed systems, blockchains rely on some overlay network connecting participants, possibly providing a membership mechanism.
+Both public and private blockchains rely on some form of membership mechanism providing peers with a view of other participants.
+Existing systems often employ partial view protocols due to their natural scalability.
+However, recent work have shown that full view protocols are feasible in practice, and can scale to thousands of participants.
+With full membership, applications can send messages directly to their destination without any intermediate hops.
+
+In this thesis we will combine a intrusion tolerant full membership protocol with a recent proposal for blockchain systems thats does not consume excessive energy.
+We will build a proof-of-concept implementation and evaluate its performance.
+
+%In this thesis we will build on a previous proposal and build a proof-of-concept blockchain system based on \textit{gossip}, with configurable membership.
+    
+
+\end{abstract}
+
+\begin{acknowledgement}
+%Firstly i want to thank the lord and saviors of our faculty, Erlend Graff for creating this fantastic Latex template, saving me countless hours of Latex battling.
+%Secondly, Jan Fuglesteg for being the man, the myth, the legend of our administration.  
+\end{acknowledgement}
+
+\tableofcontents
+%\glsaddall
+%\printacronyms
+%\listofdefinition
+%\listoflistings
+\listofcodedefinition
+%\listofcodelistings
+%\listofglossaries
+\printacronyms
+%\printglossary
+
+%:-------------------------- Mainmatter -----------------------
+\mainmatter
+
+
+\chapter{Introduction}\label{chap:intro}
+Blockchains are becoming an important building-block for distributed systems and Internet services. 
+They provide applications with a distributed data structure, often referred to as a distributed ledger, where participants can interact without any form of trust \cite{bookblock, bitcoin}.
+However, blockchains struggle with meeting throughput and latency demands of real world applications~\cite{quest, teddy, teddy2}.
+Existing blockchains, like Bitcoin~\cite{bitcoin} and Ethereum~\cite{ether}, are \textit{permissionless}, or public: any process can join the system and execute protocol steps. 
+Such systems are, however, susceptible to Sybil attacks~\cite{sybil} where the adversary controls a majority of nodes and thus dictates system state.
+To prevent such attacks, most permissionless blockchains deploy \gls{pow}-based consensus, often called \textit{Nakamoto consensus}, where participants contribute computing power to further progress the chain.
+\gls{pow} is the act of presenting proof that you have committed computing power to solve a cryptographic puzzle. 
+Hence, an adversary's influence in the system is bounded by how much computing power he has, and not how many identities he is able to produce.
+\gls{pow} chains provide fully open membership, but have throughput issues \cite{bitcoin, quest, algorand, scaleblock, teddy, teddy2}.
+With Bitcoin currently having a peak throughput of 7 transaction per second and latency of 60 minutes (if you follow the advised 6 block rule) \cite{scaleblock}.
+
+
+Some blockchains are \textit{permissioned}, or private: only selected peers are allowed to join the system, where identities of all participants are known.
+With admission control and known identities, private chains often employ classic \gls{bft} consensus~\cite{pbft, smr, paxos, general}. 
+Permissioned blockchains such as Tendermint~\cite{tendermint}, Hyperledger Fabric~\cite{hyper}, MultiChain~\cite{multichain}, and Quorum~\cite{quor} employ \gls{bft}-based consensus, where participants co-operate in progressing the chain.
+They have significantly better throughput, but have a closed membership and scalability issues \cite{quest}, typically not being able to scale beyond 100 members \cite{pbft}.
+
+%Maintaining this immutable distributed ledger by \gls{pow}, requires vast amounts of computing power, consuming lots of electricity.
+%Most blockchains are either \textit{permisonless} and based on \gls{pow} or \textit{permisoned} and based on \gls{bft} protocols.
+
+%membership protocols?
+
+
+Most distributed systems, including blockchains, rely on some form of membership mechanism.
+Existing membership protocols such as Cyclon~\cite{cyclon}, Scamp~\cite{scamp}, and Horus~\cite{horus} all provide partial membership views.
+Systems such as Pastry~\cite{pastry} and Chord~\cite{chord} incorporates a partial membership directly in their application.
+The main benefit of partial membership systems are increased scalability, both in terms of memory requirements and complexity of membership updates.
+They scale logarithmically in the number of participants.
+If a peer joins or leaves the network, not all participants need to be notified by the change in membership.
+Likewise, a single peer does not need to maintain information about all other participants, only a subset.
+By only maintaining a subset of the entire membership, peers do not need to receive all updates, thus, limiting bandwidth usage.
+However, partial views require all messages to be routed through the overlay network, increasing the chance of encountering a byzantine participant at each hop \cite{onehop}.
+It was previously assumed that maintaining full membership views were infeasible due to bandwidth, memory, scalability, and handling frequent membership changes \cite{p2pmem}.
+However, Fireflies~\cite{flies, flies2} and \cite{onehop} have showed the feasibility of maintaining full membership views and their benefits, such as point-to-point messaging.
+Fireflies scales to thousands of participants, with memory requirement per participant around 600B, requiring 60 \gls{mb} for 100000 participants.
+Bandwidth usage, both under normal operation and when under attack, have been measured in \cite{flies} and deemed acceptable.
+ 
+ 
+In Bitcoin \cite{bitcoin}, there are no formal membership protocol. 
+Participants form a Gnutella-like \cite{gnutella} unstructured overlay network, which converges towards a full membership view.
+To join the network, peers contact a set of \gls{dns} servers which relays information of existing participants.
+Peers advertise addresses of already observed participants to neighboring peers, essentially flooding membership information.
+Hence, after joining, peers will continuously learn of other participants in the network.   
+However, there are no measures to leave the network, peers might linger in the view of others long after they stopped participating.
+As observed by \cite{propa}, at their time of writing 16000 peer addresses where being advertised, while only 3500 where reachable.
+
+
+   
+
+\section{Problem definition}
+\glsreset{pow}
+\glsreset{bft}
+
+\gls{pow} and \gls{bft} chains are effectively on separate ends of a spectrum \cite{quest}.
+One scales, has open membership, but with low throughput, the other does not scale, has closed membership, but with high throughput.
+
+%Our objective is to explore the applicability of a blockchain based on gossip.
+%We investigate how efficient we are able agree upon blocks with Fireflies as our underlying network substrate.
+%\glsreset{pow}
+We want to investigate if we can devise a scalable approach based on previous work, without the energy consumption of \gls{pow} chains, but with configurable membership. 
+Our thesis is that:
+\newtheorem{statement}{Statement}
+\begin{quote}
+	%\textit{Implement and evaluate a proof-of-concept blockchain based on gossip, and implement the Fireflies protocol as its underlying networking substrate.}
+	\textit{An efficient and scalable blockchain can be built using a Byzantine fault-tolerant gossip service.}
+\end{quote}
+
+The protocol created and presented in \cite{vanblock} introduces another approach, basing a blockchain's consensus mechanism on \textit{gossip} \cite{epidemic}.
+We aim to further build on this work and the earlier work of Fireflies \cite{flies, flies2}.
+Fireflies is, as of our knowledge, the only full membership view protocol capable of scaling to a size similar to that of the Bitcoin network.
+%For membership, \cite{vanblock} also suggests using Fireflies \cite{flies} which provides a intrusion-tolerant full membership view as the underlying overlay network with relative open membership.
+
+
+
+%We argue that Fireflies would be an ideal membership protocol for distributed systems of that scale.
+%As Bitcoin effectively disseminates new transactions and blocks between neighboring peers, Fireflies would be a suitable network substrate.  
+%By organizing participants in pseudo-random mesh, Fireflies enables peers to deterministically determine who their neighbors are, and guarantee that all correct members are connected with a diameter logarithmic in the number of participants.
+
+
+
+\section{Scope \& Limitations}
+This thesis does not intend to implement a fully functioning blockchain, we want to investigate the applicability of using gossip as a consensus mechanism.
+Evaluating all possible attack vectors and security issues concerning our implementation is beyond our scope.
+We will introduce some possible attacks and discuss how they are handled. 
+Also, we are not focusing on modifying the Fireflies protocol according to our specific use case.
+Part of our objective is to show Fireflies' applicability in a distributed application, hence, we do not want to tailor it specifically for our use. 
+We assume that participants are not capable of breaking cryptographic primitives.
+
+
+
+\section{Methodology}
+In the final report by the Core of Computer science \cite{methodology}, the task force describes the discipline of computer science.
+From their findings, computer science is the systematic study of algorithmic processes, their theory, design, analysis, implementation and application \cite{methodology}.
+With the fundamental underlying question: what can be efficiently automated?
+\begin{description}
+\item[Theory] rooted in mathematics and consists of four steps; define objects to study, make hypothesis about the relations between objects, determine whether the predicted relations were correct, and interpreting results.  
+\item[Abstraction] rooted in the experimental scientific method consisting of four parts. 
+Forming a hypothesis, create a model to test the hypothesis, design experiments and retrieve results, and finally analyzing result data.	
+\item[Design] rooted in engineering and follows four steps; requirements, specifications, design and implementation, and testing. 
+\end{description}
+This thesis is rooted in \textit{systems research}, which to some extent belongs to all three paradigms. 
+We use existing knowledge of blockchains and Fireflies to devise a system with the intent of solving an existing issue in the blockchain design space. 
+From this we design a prototype to develop and test.
+After developing a prototype, we design experiments to evaluate if our system solves the given problem.
+
+
+
+%corpore
+\section{Context}
+This thesis was implemented and written in the context of the Corpore Sano\footnote{http://www.corporesano.no/} research group.
+The Corpore Sano research group focuses on interdisciplinary research with computer, nutritional and sport science.
+With emphasis on personalized intervention technologies to improve health and wellness of people.
+    
+Corpore Sano are currently working in close cooperation with the elite football club Tromsø IL, with existing systems such as Bagadus~\cite{baga, baga2, baga3} and Muithu~\cite{mui, mui2} currently deployed.
+Bagadus~\cite{baga, baga2, baga3} is a sport analysis system primarily focused on recording sport games and provide analytical feedback.
+Coaches can monitor real-time performance of their players and analyze team performance both at half-time and after matches.
+Muithu~\cite{mui, mui2} is a event based tagging system, providing coaches with ability to tag events as they occur on field.
+After tagging an event, typically by pressing a button on a pad, a recording of the preceding situation on-field is created and stored.
+Coaches can later view the recording, typically useful to further investigate certain situations.
+For example, tagging an event right after a player makes a vital mistake, which can later be brought up and analyzed.
+
+
+Corpore Sano also developed the intrusion tolerant network Fireflies, which this thesis is built upon.
+Fireflies is a full membership protocol capable of scaling to thousands of participants, we will go into further detail on Fireflies later on.
+In the blockchain subspace, Corpore Sano has investigated Bitcoin's, scalability, performance and cost~\cite{teddy, teddy2}.
+%Mainly focusing on analyzing if its profitable to trade network performance for ex 
+  
+  
+
+
+\section{Outline}
+The rest of this thesis is organized as follows:
+\begin{description}
+\item[\autoref{chap:back}] introduces background knowledge about related topics such as: blockchains, \gls{pow}, \gls{pos}, and gossip protocols.
+
+\item[\autoref{chap:fireflies}] Presents and explains the Fireflies protocol.
+
+\item[\autoref{chap:ifrit}] Covers the design and implementation of our Fireflies implementation.
+
+\item[\autoref{chap:firechain}] Covers the design and implementation of the blockchain protocol.
+
+\item[\autoref{chap:evaluation}] Presents and discusses experimental results of our implementation.
+
+\item[\autoref{chap:conclusion}] Discusses future work and concludes the thesis.   
+\end{description}
+
+%\chapter{Related work}
+%The fireflies protocol was created and implemented by \cite{flies}, and shows that byzantine fault tolerant protocols maintaining full membership views are viable.
+
+
+\chapter{Background \& Related Work} \label{chap:back}
+\glsreset{pow}
+\glsreset{bft}
+\glsreset{pos}
+
+
+\section{Blockchain}
+Blockchains are distributed systems where member processes cooperate to maintain an agreed upon common append only data structure, often called a ledger \cite{bookblock, bitcoin}.
+All participants keep a copy of the ledger, and execute a consensus protocol to validate and agree upon its content.
+Data entries are grouped into blocks, which in turn is built into a hash chain of blocks.
+Peers participate in the consensus protocol to agree upon the ordering of blocks and their contained entries.
+With the goal of progressing the chain, while preventing malicious participants from altering already agreed upon content.
+
+Blockchain systems can be split into two main groups; permissioned and permissonless.
+In permissioned systems identities of all participants are known and is not open for public access, there is a minor form of trust between participants.
+Permissionless systems are open for everyone, and identities of participants are not known.
+There are no trust assumption between peers in such systems. 
+
+
+\subsection{Proof-Of-Work}
+As peers are anonymous in permissionless systems, they are susceptible to Sybil attacks~\cite{sybil}.
+Where an adversary attempts to gain control over a system by generating near infinite identities, thereby gaining influence and dictating system state.
+Hence, such systems need other mechanisms to fight these attacks. 
+%As permissionless systems may include malicious participants, some mechanism is needed to ensure that the overall system is behaving correct and is making progress.  
+
+Achieving consensus among a set of possibly malicious, anonymous entities is non-trivial.
+\gls{bft} consensus is susceptible to Sybil attacks~\cite{sybil} when participants are not identifiable.
+\gls{pow} consensus was introduced in \cite{bitcoin}, where participants solve cryptographic puzzles to further progress the chain.
+Participants present their verifiable solution to the cryptographic puzzle to other peers, proving that they committed computational power to solve it.
+\gls{pow} acts as leader election, where the first peer to solve the current cryptographic puzzle, effectively finding the next block, has the authority to decide its content and is rewarded for his work.
+Thus, a peer's influence in the system is bounded by the computational power he is capable of generating, and not the amount identities he is able to create.
+To invalidate a committed transaction, an adversary would have to create a separate branch of blocks, often called a \textit{fork}, and out-pace the main chain.
+Hence, after a transaction is \textit{deep} in the chain, it would require a significant amount of computational power to remove it, ensuring that transactions are immutable and permanent after being committed.
+In Bitcoin \cite{bitcoin}, participants deem the longest chain, the main chain.
+After overtaking the main chain, honest peers would consider the created fork the new main chain, thus, invalidating blocks that were committed after the point of forking.
+Honest participants might also accidentally introduce forks by solving the current cryptographic puzzle simultaneously.
+
+
+\subsection{Proof-Of-Stake}
+The motivation for adopting a \gls{pos}-consensus model is to avoid the significant energy costs of \gls{pow} chains.
+In general, \gls{pow} chains require a lot of electricity to maintain and progress.
+With the Bitcoin~\cite{bitcoin} network currently consuming the same amount of energy as Ireland~\cite{bitenergy}.
+Also, in the absence of \gls{pow} computations, a system might be able to increase throughput and decrease latencies significantly.
+However, \gls{pos} have shown to be complex in practice \cite{challengepos}.   
+
+\gls{pos} is similar to \gls{pow} in that they both periodically elect a leader responsible for determining the next block.
+However, in \gls{pos}, leader election is weighted by each participant's \textit{stake} in the system, where \textit{stake} represents how much resources a participant has invested in the system.
+Either electing a single leader for each time slot or forming committees of \textit{stakeholders}, where \textit{stakeholders} is the set of participants with the most stake.
+Stakeholders have a higher probability of being elected leader than participants with lower amount of stake in the system. 
+In the context of crypto-currencies, stake could be determined by how much crypto-currency a peer is in possession of.
+Instead of participants competing for the authority to determine the next block as in \gls{pow}, a peer is selected at random at every time slot, with peers weighted based on their stake in the system.
+When elected leader, a peer determines the next block, linking it to a previous one.
+By avoiding the computational cost of \gls{pow}, \gls{pos} is able to reduce transaction confirmation time.
+However, implementing a fair and secure \gls{pos} in practice is challenging \cite{challengepos}. 
+If a malicious peer is elected leader, he could generate two blocks, introducing one to the full system and the second to a set of isolated peers.
+Distribution of wealth is also important, if a single peer is in possession of nearly all the wealth, he will have a significant influence in the system.
+Although, peers with significant wealth are incentivized to operate honestly, if they are caught in being dishonest they are effectively undermining their own wealth.
+Blockchains based on \gls{pos} include Blackcoin~\cite{blackcoin}, Ppcoin~\cite{ppcoin}, Ouroboros~\cite{provepos}, and Algorand~\cite{algorand}.
+Ethererum~\cite{ether} is currently based on \gls{pow}, but there are proposals to adopt a \gls{pos} and \gls{pow} hybrid approach \cite{casper}.
+
+
+\section{Bitcoin}
+The most common usage of blockchains is crypto-currencies, where Bitcoin~\cite{bitcoin} and Ethereum~\cite{ether} are the most popular systems in use today.
+Crypto-currencies use blockchain to create a transfer log of some digital currency to and from accounts.
+Effectively creating a log of transactions between pseudo-anonymous entities, without any form of trust.  
+They are unique in that they are the first technology to solve the double spending attack without any form of trusted third party.
+
+Bitcoin \cite{bitcoin} is based on \gls{pow}-consenus, which is proven to converge except for a negligible probability \cite{powbit}.  
+Peers transfer \textit{bitcoin} by creating and verifying \textit{transactions}.
+A transaction transfers bitcoin between one or more source accounts to one or more destination accounts \cite{propa}.
+An account consists of a public/private key-pair.
+To prevent forging of transactions, all transactions are signed by the sender's private key.
+Validation of transactions involve checking signatures and verifying that the sender actually has the amount of bitcoin he intends to transfer.
+Transactions essentially have a set of \textit{inputs} which has to originate from previous transactions, and a set of \textit{outputs}.
+These outputs can only be claimed once, and new ones are only created from new transactions.
+However, participants might receive transactions in different order.
+A transaction might claim an output of a previous one, which the participant have not yet received.
+Peers might also try to spend coins twice, referred to as a \textit{double spending attack}.
+This could occur both by malicious intent or accident, where separate transactions try to spend the same output \cite{propa}.
+
+Transactions are disseminated in the network and included in everyones local ledger if valid.
+However, there needs to exist a commit mechanism to persist a set of transaction globally in all participants ledger's.
+Implementing a global commit mechanism in a distributed system with anonymous participants is non-trivial. 
+Bitcoin periodically gather a set of transactions within a \textit{block}, where each block links to the previous one by its hash value, effectively creating a hash of blocks.
+Blocks are introduced each time a participant solves the current cryptographic puzzle (\gls{pow}), often referred to as \textit{mining}.
+Participants that actively solve cryptographic puzzles are referred to as \textit{miners}, and after solving a puzzle are paid for their efforts.
+The newly mined block and its content is then disseminated throughout the network, and included in everyone's ledger, effectively globally committing all the transactions present in the block.
+However, participants might solve the puzzle simultaneously, creating two valid system paths referred to as a \textit{fork}.
+Bitcoin resolves forks by always following the longest chain, hence, participants are guaranteed that the main chain has the majority of computing power in the system.
+There have been proposals to change the chain selection algorithm, Ghost \cite{ghost} suggests not only evaluating chains by their length, but the weight of their entire subtree. 
+Thereby, an attacker cannot secretly create a hidden chain over time and introduce it later, effectively replacing a huge part of the previous main chain.
+This approach was later adopted by Ethereum \cite{ether}.
+
+
+Bitcoin disseminates membership, transactions, and blocks in a flooding-like fashion \cite{propa}.
+Peers advertise observed participants to neighboring peers, but there are no mechanism to leave the network or remove crashed peers.
+Hence, advertised peers are not necessarily still participating or alive.
+After verifying new transactions or blocks, peers advertise their availability to neighbors by issuing \textit{inv} messages containing their ids.
+Subsequently, neighbors can request them by issuing a \textit{getdata} message containing the ids of the ones missing from the their local storage. 
+Thereby, blocks and transactions are constantly flooded throughout the network upon creation.
+When two or more participants create a fork as explained earlier, a race begins to disseminate your block quickest.
+The more participants you spread your block to, the more peers will start working on your branch, hence, accumulating more computing power to your cause.
+With more computing power dedicated to your branch, the higher the probability that it will become the main chain.
+All blocks that are not building on the main chain are deemed invalid, likewise for their containing transactions.
+
+\section{Gossip protocols}
+%Gossip protocols are essentially flooding protocols, and thus resilient to attack.
+The core concept of gossip protocols involves periodic information exchange between participants about recent events \cite{epidemic}.
+Participants periodically select a random peer in the system and reconcile information.
+By randomizing peer selection, as opposed to a fixed set, peers will eventually gossip with everyone in their view.
+With random peer selection and periodic reconciliation of information, all events will eventually spread to all participants with high probability.
+
+Dissemination of data using gossip protocols have similar mathematically properties as how infectious diseases spread in a population. 
+An approximation formula to estimate the fraction of infected hosts $Y_r$ after \textit{r} rounds, where each infected hosts infects \textit{f} other hosts each round is given by: \cite{epidemic, infect_math}.
+\begin{equation}
+Y_r \approx \frac{1}{1 + n e^{-f} r}
+\end{equation}
+Where \textit{n} is the total amount of hosts.
+The amount of infected hosts relative to uninfected ones increases exponentially each round by a factor of $e^f$~\cite{epidemic}.
+In the context of gossip protocols, the formula describes how many hosts have received a gossip message after \textit{r} rounds.
+A key detail from this equation is that the convergence of gossip among a set of hosts is correlated with the amount of gossip interactions each host initiate per round, and round frequency.
+Gossip protocols typically reconcile with only one host per round, thus, round frequency is in most cases the main convergence factor.  
+
+%Gossip protocols have shown to be robust due to the randomized selection of gossip partners.
+%With randomized partners, gossiped information converges with high probability.
+
+Gossip protocols have several strengths: they converge with high probability; impose a bounded load amidst frequent updates; not dependent on stable underlying network topologies \cite{gossip_promise}.
+Other classic distributed protocols, non-gossip based, can impose high workloads during frequent updates.
+By imposing a bounded load on participants, they will simply fall behind amidst frequent updates and converge when traffic decreases.
+These boundaries include bounded message sizes and gossip rates, how often participants gossip, and how much gossip each message can accommodate. 
+Also, gossip protocols are able to operate on most underlying network topology, only requiring sufficient connectivity and bandwidth \cite{gossip_promise}.
+ 
+%The mathematical theory of epidemics introduces a model named the Galton-Watson process or branching process \cite{branching}\cite{epidemic}.
+%\begin{equation}
+%p_{ext} = \sum_{k>=0} p^{k}_{ext}p_{k}
+%\end{equation}
+%\cite{infect_math} 
+
+Gossip protocols also have limitations.
+Bounded message sizes and slow gossip rates limit the capacity of update propagation \cite{gossip_promise}.
+If the gossip content exceeds the maximum message size, it has to be split up into several messages and distributed over multiple gossip rounds, resulting in slower update propagation.
+This presents a trade-off between lower convergence times and increased overhead.
+By increasing the gossip frequency, one could facilitate frequent updates, but this would introduce more overhead.
+In extreme cases where the gossip rate approaches the network's \gls{rtt}, resource contention at network interfaces might affect the protocol significantly \cite{gossip_promise}.
+Other weaknesses include not being resilient against malicious participants or faulty components executing the protocol incorrectly.
+If there is no method for verifying gossip data, malicious participants can pollute the system with corrupt data which becomes indistinguishable from correct data. 
+Adversaries could attack a naive gossip approach by attempting to control information flow.
+By targeting the overlay network connecting peers, an adversary can separate participants into multiple partitions.
+After separation, the adversary can feed participants whatever information he sees fit, effectively controlling the network.
+
+Gossip protocols are typically split into three types: dissemination (rumor-mongering), anti-entropy, and aggregate \cite{gossip_promise}.
+In dissemination protocols, peers only gossip about recent events, hence, propagation latency is an issue.
+If an event is not disseminated within a time frame $\Delta$, where $\Delta$ is the amount of time a peer includes an event in its local gossip set, the event is lost.
+This could occur, for instance, due to network partitions, network outage, slow participants.
+Although, $\Delta$ would be reset for each time the event spreads to a new participants, given that $\Delta$ is started upon receiving the event, and not based on a timestamp contained in the event for when it occurred. 
+Events also have high latency from when they occur to when they are delivered to all participants.
+Since peers only gossip about recent events, messages are small, thus, reducing bandwidth usage compared to anti-entropy.
+
+Anti-entropy protocols reconcile state in each gossip interaction, typically used for data replication~\cite{gossip_promise}.
+After peer \textit{a} and \textit{b} engages in a gossip interaction, both will have the same state.
+Messages are typically significantly larger than that of dissemination protocols since peers reconcile their entire state in each interaction, resulting in increased bandwidth usage.
+However, anti-entropy provides stronger convergence guarantees than dissemination since the entire state is reconciled in each interaction, and not just recent events.
+
+Aggregate protocols aim to combine information from all participants and compute some system wide value~\cite{gossip_promise}.
+For example, like computing sum, max, median across the entire network.
+With highly scalable systems, computing aggregate values on data across entire systems are often more interesting than data at individual nodes~\cite{tag, agggossip, astrolabe}.
+%Astrolabe\cite{astrolabe} creates a
+
+
+
+
+%A protcol can be classified as a gossip protocol if it satisfies the following critera: %\cite{gossip_promise}...
+  
+ 
+%It's often assumed that gossip protocols are \cite{robust} 
+
+%The core concept of gossip protocols involves periodic exchange of information between  %participants in the protocol \cite{gossip_promise}.
+%For example, at given time intervals participants select a random gossip partner and reconcile information.
+%The system will eventually become consistent across participants when updates cease to occur(appear?). 
+
+%Gossip protocols can be split into three main groups:
+\iffalse
+\section{Go concurrency}
+\gls{go}\footnote{https://golang.org/} is an open source language developed by Google in October 2009 and was officially released in October 2013.
+Go is a garbage collected and statically typed language with CSP-style concurrency features.
+
+The overall \gls{go} environment is shown in \autoref{go_structure}, based on the figure presented in \cite{go_scheduler}.
+The \gls{go} runtime is responsible for the creation and management of \gls{go}'s thread abstraction, \textit{goroutines}.
+More specifically, the \gls{go} runtime provides a scheduler, responsible for scheduling goroutines on \gls{os} threads. 
+\gls{go} is a relatively new language and there is still ongoing work on improving its runtime, with most of the effort directed towards improving the scheduler.
+The most recent proposition to scheduler improvements are described in \cite{go_scheduler}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{scheduler.pdf}
+	\caption{\gls{go} environment}
+	\label{go_structure}
+\end{figure}
+
+Studies such as \cite{go_bench} have done performance analysis of parallel computing in several languages, including \gls{go}.
+In the study, \gls{go} loses to Cilk\cite{cilk} and \gls{tbb}\cite{tbb} in parallel performance, however, these languages are not general purpose languages and are primarily focused on parallel computing.
+Also, they have matured overtime, which \gls{go} haven't had a chance to yet.
+The study was published in 2013 and there have been changes to the \gls{go} scheduler since.
+
+When discussing threading models, there are usually three main approaches.\footnote{https://morsmachine.dk/go-scheduler}
+Mapping several user threads to the same \gls{os} thread, providing efficient context switches, but does not exploit multi-processor systems.
+A one-to-one mapping between \gls{os} threads and user space threads, fully exploiting multi-processor systems, but resulting in expensive context switches.
+\gls{go} tries to provide both, by scheduling an arbitrary amount of goroutines on an arbitrary amount of \gls{os} threads. 
+Hence, providing both efficient context switches and utilizing multi-processor systems, at the cost of extra complexity in the \gls{go} scheduler.
+
+\gls{go}'s concurrency model evolves around \textit{goroutines}, which are lightweight threads, scheduled by the go runtime \cite{go}.
+Multiple goroutines might be scheduled on the same system thread, as opposed to other languages, which often map program threads directly to system threads.
+When a goroutine is blocked, the go runtime switches to another goroutine, which is less costly than context switching to another system thread.
+As a result, Go can accommodate more program concurrency compared to most languages.
+Due to goroutine's lightweight nature, its possible to accommodate thousands of them, as opposed to lower amounts of classical threads. 
+
+
+Lastly, writing concurrent code in \gls{go} is straightforward, a basic example of spawning goroutines is shown in \autoref{lst:go_example}.
+A goroutine is spawned by issuing the \textit{go} statement followed by a function call.
+In the example, each goroutine sends back the result value by communicating through a channel, which is a synchronization primitive in \gls{go}.
+
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Basic example of go concurrency.]%
+		Basic example of go concurrency.%
+	}, label={lst:go_example}, style=linenumbers]{goconc.go}
+\end{code}
+
+
+\fi
+
+
+%\chapter{Related work}
+
+\section{Gossip in blockchains}
+%Several blockchains use some form of gossiping, for example, participants in Bitcoin gossip with neighboring peers about recent transactions and blocks. 
+%Effectively, performing dissemination-type gossiping.
+
+Most existing blockchain systems use some form of gossiping to disseminate transaction, block, and membership information.
+By utilizing gossip, participants will eventually receive all transactions and blocks with high probability. 
+For example, participants in Bitcoin gossip with neighboring peers about recent transactions, blocks, and advertise membership of other participants.
+Hyperledger Fabric \cite{hyper} is a platform for deploying and operating permissioned blockchains. 
+In Fabric, participants gossip about blocks, transactions, and membership information.
+Fabric divides gossiping into two modes: pull and push, where participants request state from other peers during pulling, and sends their state while pushing.
+Algorand \cite{algorand} uses a similar gossip approach as Bitcoin, where participants select a small subset of peers to gossip with. 
+%Algorand's gossip network is inherently susceptible to Sybil attacks\cite{algorand, sybil}, and we believe that Fireflies \cite{flies} would be an ideal Sybil-resistant gossip network.
+However, in these systems gossip is typically used for disseminating blocks, transaction, and possibly membership information, and not as a consensus mechanism which we intend to. 
+
+The protocol presented in \cite{vanblock}, is as of our knowledge, the only blockchain consensus protocol fully based on gossip.
+We base our consensus solution on the work presented in \cite{vanblock}, where participants agree upon blocks by relying gossip that converges with high probability.
+We will be explaining our full design and implementation based on this protocol later on
+
+
+
+\section{PoW chains}
+Bitcoin-NG~\cite{ng} is a scalable blockchain protocol with the same trust model as Bitcoin.
+They divide their protocol into two parts: leader election and transaction serialization.
+In Bitcoin, the miner who first solves the current \gls{pow} effectively becomes the leader and serializes transaction history of the next block.
+Bitcoin-NG divides time into epochs, where in each epoch a leader is elected by solving a \gls{pow}, as in Bitcoin.
+Block created from \gls{pow} is called a \textit{keyblock} which does not include any transactions.
+Without content, the block can be disseminated more efficiently due to its small size.
+The leader then generates a series of \textit{microblocks} containing transactions, these do not contain any \gls{pow} and can thus be produced faster than \textit{keyblocks}.
+Hence, transaction latencies are bounded by network propagation delay of \textit{microblocks} and the more infrequent leader election of \textit{keyblocks}.
+
+%By decoupling leader election and transaction serialization, Bitcoin-NG
+
+Ethereum~\cite{ether} is a generalized blockchain platform for executing \textit{smart contracts}, which essentially are distributed applications.
+Ethereum follows an \textit{order-execute} paradigm where all smart contracts are ordered at all peers before executing them sequentially.
+After peers complete a \gls{pow}, they sequentially execute all transaction within that block, likewise for all other participants receiving a new block.
+Thereby, all smart contracts are executed by all participants such that they converge to the same state.
+However, smart contracts are written by potentially untrusted developers.
+Hence, adversaries could execute a \gls{dos} attack by deploying a smart contract with an endless loop.
+To solve this, Ethereum introduces \textit{gas}, which is payment for execution.
+The payment currency is Ethereum's native crypto-currency, \textit{ether}.
+Thereby, the transaction issuer pays ether for having participants execute his smart contracts.
+All smart contracts are written in Ethereum's own scripting language Solidity, executed in their own \gls{vm} \cite{ethervm, solidity}.
+By providing their own \gls{vm}, Ethereum can determine execution costs and evaluate if smart contracts are deterministic.
+Ethereum \cite{ether} is currently based on \gls{pow} consensus, but there are proposals \cite{casper} to adopt a \gls{pow} \& \gls{pos} hybrid.
+
+Recent proposals, like Ghost~\cite{ghost, ghost2}, Spectre~\cite{spec}, and Meshcash~\cite{tort} aims to increase Bitcoins throughput by replacing the underlying chain structure with a \gls{dag}.
+With a \gls{dag}, chains can be evaluated on more metrics than just length.
+More specifically, Ghost~\cite{ghost} proposes to evaluate chains not only by length, but by the weight of their subtrees.
+From this, they are able to improve throughput significantly.
+These systems are based on \gls{pow} consensus, where chain progression is bound by computing power.
+As our system does not intend to use \gls{pow} consensus, the benefits of a \gls{dag} are not obvious, but could be explored more in the future.
+
+
+\section{PoS chains}
+Algorand~\cite{algorand, algorand2} is a relatively new crypto-currency, with transaction latencies in the order of minutes and throughput 125 times that of Bitcoin.
+They achieve this through the use of a \gls{ba} protocol to reach consensus among participants on new sets of transactions.
+To scale the agreement among many participants, only a selected few take part in each decision.
+Peers compute a Verifiable Random Function~\cite{verirandom} to check whether they were selected to participate in the next \gls{ba}.
+Algorand implements \gls{pos} by assigning a weight to each participant based on their wealth.
+A peer's probability of being selected to participate in the \gls{ba} protocol is thus directly correlated to their wealth.  
+By having a committee, effectively a small subset of the network with the most wealth, Algorand can reach consensus about new blocks and transactions in about a minute. 
+Additionally, they avoid forks, even in the case where parts of the committee is malicious.
+%mention no forks?  
+%However, a committee member might be malicious 		
+
+Algorand's gossip protocol is inherently susceptible to Sybil attacks \cite{sybil}, this is clearly stated in \cite{algorand}.
+The paper does not specifically state whether Algorand targets a permissioned or permissionless deployment.
+If Algorand does not target a fully permissionless environment, similar to Bitcoin \cite{bitcoin} where there are no elements of trust, Fireflies \cite{flies} would be an ideal candidate to provide a Sybil resistant gossip network.
+However, Fireflies requires a trusted \gls{ca}, thus, the environment has to have one trust component.
+With Fireflies as the underlying membership and gossip protocol, Algorand would be Sybil resistant.
+
+
+
+Ouroboros~\cite{provepos} is a recent proposal for pure \gls{pos} blockchains which rigorously prove their security guarantees.
+The set of peers with the most wealth in the system, namely stakeholders, participate in a coin-flipping protocol to select a leader for the current epoch.
+Ouroboros assumes that an adversary cannot corrupt participants for a duration longer than an epoch (e.g a day).
+\gls{pos} chains are susceptible to \textit{grinding attacks} where an adversary attempt to manipulate the randomness in leader selection to his advantage.
+Such attacks have a severe impact on \gls{pos} chain that base their entropy on chain content.
+Ouroboros's joint-coin-flipping protocol does not depend on chain content and prevents adversaries from manipulating it.
+
+
+\section{BFT chains}
+Hyperledger Fabric~\cite{hyper, hyper2, hyper3, hyper4} is a open source system for deploying permissioned blockchains.
+Fabric expands upon what Ethereum does with smart contracts in a perimissioned setting.
+However, Fabric is novel in that it supports writing distributed applications (smart contracts) in general purposes languages such as \gls{go} and C/C++.
+Other smart contract blockchain systems such as Ethereum~\cite{ether} follows a \textit{order-execute} paradigm, where all smart contracts are firstly ordered and validated before they are sequentially executed by all participants.
+Fabric introduces a novel \textit{execute-order-validate} paradigm, essentially executing smart contracts in parallel before ordering them, increasing throughput significantly.
+Previous systems often hardcode their consensus protocols, while Fabric supports modular consensus.
+By providing pluggable consensus, applications can deploy protocols suitable for their deployment environment.	
+Fabric achieves a throughput around 3500 transactions per second with sub-second latencies, and scales to over 100 nodes.
+Its membership service is not explained in detail, but it seems that participants gossip about recent membership changes, both leaving and joining peers.
+Hence, either participants are assigned to monitor other specific peers, or they randomly discover them to be unavailable when they try to gossip with them.
+We argue that Fireflies would be a fitting membership service in Fabric's permissioned setting.
+%As Fabric \footnote{https://github.com/hyperledger/fabric} is written in \gls{go}, this makes for an even better fit as Ifrit is a \gls{go} library.  
+
+
+
+
+%Tendermint\cite{tendermint}?
+
+
+ByzCoin~\cite{byz} adopts the same approach as Bitcoin-NG~\cite{ng}, decoupling leader election and transaction serialization.
+They form a committee responsible for serializing transactions, where each peer's voting power is dependent on his recent hashing power contribution.
+The committee acts as a sliding window of participants, where only the most recent contributors are included.
+Hence, only peers that have recently contributed computing power is allowed to take part in the consensus protocol.
+When a peer finds a new block, he receives a \textit{consensus group share}, effectively granting him more influence in the system.
+As a result, \gls{pow} acts as \textit{proof-of-membership} within the consensus committee, regulating voting influence between peers.
+Although ByzCoin employs \gls{pow}, its consensus scheme is based on \gls{bft} with \gls{pow} only serving as \textit{proof-of-membership} and chain progression.
+By forming a consensus committee based on recent activity, ByzCoin can execute \gls{bft} consensus with a subset of recently active peers.
+ByzCoin also utilizes a collective signing mechanism CoSi~\cite{cos}, enabling the leader in each epoch to gather signatures of other participants in the consensus group in a scalable manner.
+
+
+
+
+\chapter{The Fireflies Membership Protocol}\label{chap:fireflies}
+%Overlay networks are vulnerable to attacks if the mechanism controlling membership information is vulnerable
+
+%If the mechanism of an overlay network controlling membership information is vulnerable, an attacker can effectively control the network \cite{flies}.
+
+The Fireflies protocol~\cite{flies, flies2} provide all correct members processes in a distributed system with up-to-date views on all other correct and stopped processes in that system. The protocol is resilient to denial-of-service attacks and Byzantine faults, yet scales to support views with several thousands of members.
+
+The protocol defines three data structures, an overlay mesh structure, and 10 rules for maintaining membership correctly. 
+The overlay mesh structure consists of an arbitrary number of rings, each containing all members arranged in a pseudo random order.
+Nodes have exactly one successor and one predecessor in each ring. 
+A node's successor and predecessor refers to their placement relative to the particular node in a given ring.
+Each node has a set of neighbors consisting of all their successors and predecessors in all rings. 
+Nodes gossip with their neighbors and are responsible for monitoring their immediate successors.
+By having all participants present in all rings, but in different orders, Fireflies enforces diverse neighbors. 
+
+If a node stops responding, its predecessor will accuse the node of being crashed by gossiping an accusation.
+Upon receiving a valid accusation, nodes start a local timer associated with the accused node, and at the time of expiration the accused will consider the node crashed.
+However, nodes can be falsely accused by being temporary unavailable or slow, therefore, nodes are able to issue a rebuttal if they receive an accusation concerning themselves.
+The Fireflies protocol~\cite{flies} impose a set of rules, these will be presented throughout the chapter. 
+
+If an attacker is capable of compromising membership information in an overlay network, he can effectively control it \cite{flies}.
+The goal of Fireflies is to prevent this by providing an intrusion tolerant network capable of operating in the presence of byzantine members.    
+
+
+
+\section{Certificate authority}
+\glsreset{ca}
+As with all distributed systems that relies on some form of agreement, Fireflies is vulnerable to Sybil attacks. 
+Fireflies counter this by requiring members to obtain cryptographic certificates signed by a trusted \gls{ca}. 
+The \gls{ca} is required to implement some means to limit the rate of Byzantine nodes joining the network.
+
+All participants can be securely identified by their respective certificates.
+These certificates are distributed through gossip, hence, a node does not need to be in direct contact with a new participant to receive his certificate.
+A new participant will not be accepted by others unless they present a valid certificate sign by the \gls
+{ca}. 
+By requiring signed certificates, the identities of all participants are known and thus we avoid Sybil attacks~\cite{sybil}. 
+The \gls{ca} thwarts Sybil attacks by limiting an attackers ability to obtain multiple valid certificates.
+
+\section{Data structures}
+With the Fireflies protocol, each member maintains four data sets concerning other nodes: certificates, notes, accusations, and timeouts \cite{flies}.
+%Gossip protocols are inherently susceptible to data corruption, especially when peers republish other participants messages.
+%Providing adversaries with the opportunity to tamper with messages.
+All gossiped data structures are signed and can be verified at the receiver, forming the first rule of Fireflies. 
+\begin{description}
+\item[Rule 1] A \textit{note} or an \textit{accusation} is only valid if its correctly signed with the private key of its creator, and the creator's certificate is correctly signed by a common trusted \gls{ca}.
+\end{description}
+%\paragraph{Rule 1} A \textit{note} or an \textit{accusation} is only valid if its correctly signed with the private key of the creator, and the creator's certificate is correctly signed by a common trusted \gls{ca}.
+
+\subsection{Certificates}
+Certificates are X.509 compliant and used to establish secure gossip communication channels through \gls{tls}.
+They contain node's unique identifier generated by the \gls{ca}, their public key, and their network address, effectively binding their public key to their identifier and network address.  
+Also, the amount of gossip rings are stored in a X.509 extension field.
+Certificates are gossiped between nodes, upon receiving one, its signature is verified to ensure validity.
+By having them signed by commonly trusted \gls{ca}, we ensure that all of its content is tamper-proof and can securely identify participants.
+The purpose of certificates is to provide an immutable data structure that can uniquely identify nodes, and facilitate \gls{tls} communication.
+
+\subsection{Notes}
+A \textit{note} represents a life signal from a node, containing: an epoch, a mask, a signature, and the node's unique identifier as shown in \autoref{note}.
+Epochs are monotonically increasing counters, establishing the order of notes received from a particular node.
+Only the most recent note is deemed valid as described in Rule 2.
+The mask is a bit field representing enabled rings. 
+If a node is falsely accused by its predecessor, it can disable that specific ring by setting the corresponding mask bit to zero. 
+Effectively informing other nodes to ignore accusations concerning itself originating from its predecessor on that ring.
+When falsely accused, notes are used to rebut the accusation by incrementing the epoch number, invalidating the accusation as described in Rule 5.
+
+\begin{description}
+\item[Rule 2] A \textit{note} from node \textit{p} is only valid if its the most recent observed note from \textit{p}.
+\item[Rule 5] Upon receiving a valid \textit{accusation} concerning itself, a correct member will immediately gossip a new note with an incremented epoch.
+Thereby invalidating the \textit{accusation} at all other correct nodes.
+\end{description}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.6]{notes.pdf}
+	\caption{Note structure, numbers above fields refer to where they start.}
+	\label{note}
+\end{figure}
+
+
+\subsection{Accusations}
+An \textit{accusation} contains the epoch of the accused's most recent note, a ring number, a signature, and the accuser's identifier as shown in \autoref{accu}.
+When a node stops responding to pings, its predecessor creates an accusation which will eventually be disseminated throughout the network.
+The ring number represents which ring the accusation originated from, this is necessary to determine validity according to Rule 8.
+An accusation is only valid if the note associated with it is valid, and the accuser is the direct predecessor of the accused as described in Rule 3 and Rule 8. 
+Therefore, when a rebuttal is issued with a higher epoch number, the accusation becomes invalid due to the note associated with it becoming invalid.
+
+\begin{description}
+\item[Rule 3] An \textit{accusation} is only valid if the associated note is valid.
+\item[Rule 8] An \textit{accusation} is only valid in ring \textit{r} if the accuser is the direct predecessor of the accused in ring \textit{r}.
+\end{description} 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.6]{accusations.pdf}
+	\caption{Accusation structure, numbers above fields refer to where they start.}
+	\label{accu}
+\end{figure}
+Originally, accusations contained the most recent note of the accused.
+To reduce bandwidth requirement of gossiping accucations, this was changed to only contain the most recent note's epoch, identifier, and ring number.
+This reduces the size of an accusation with 56 bytes.
+This improvement does not reduce the systems security properties since tampering with note information such as the epoch number is not helpful in trying to falsely accuse peers.
+For instance, accusations with higher epoch numbers that the current note will simply be ignored by correct members. 
+Such accusation also constitutes a proof of malicious behavior, and can be used to expel the offending member. 
+Since participants is already in possession of each other's note, when determining accusation validity, all note information will be retrieved from the accused's own signed note. 
+If a node is not in possession of the accused peer's note, the accusation is discarded.
+  
+
+\subsection{Timeouts}
+The timeout data structure is only kept as part of local state, and not disseminated to other members. They contain the last note from the accused node, the observer, and a timestamp from when the timer was started as shown in \autoref{timeout}.
+A timeout is only valid if its associated accusation is, as described in rule 4.
+Therefore, if a rebuttal is received before the timeout expires, invalidating its accusation and subsequently deleting the timeout.
+Timeouts are started as a result of receiving a valid accusation, if the timer expires, the accused node is considered crashed and removed from the local node's live view.
+However, the crashed node is not removed from the full view, enabling him to rejoin the network without having to re-disseminate his certificate throughout the network.
+
+\begin{description}
+\item[Rule 4] A \textit{timeout} concerning node \textit{p} is only valid if there exists a valid \textit{accusation} for \textit{p}.
+\end{description} 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{timeouts.pdf}
+	\caption{Timeout structure, the observer field is a local representation of a remote peer. There is no need to show byte indexes here since timeouts are not gossiped.}
+	\label{timeout}
+\end{figure}
+
+\section{Gossiping}
+All data structures are gossiped (except timeouts) in the following order: certificates, notes, and then accusations.
+This way, nodes will always be able to recognize the unique identifier present in both notes and accusations.
+Notes and accusations are signed with the private key of their creator, such that nodes can verify their integrity by using the public key stored in the creator's certificate. 
+Hence, all gossip messages are tamper-proof, and if tampered with, they are discarded as described rule 1.
+
+The Fireflies protocol also impose rules concerning gossip partners:
+\begin{description}
+	\item[Rule 9] For each ring \textit{r}, correct members maintain a secure gossip channel to their neighbors (successor and predecessor) in ring \textit{r} which are considered live.
+	\item[Rule 10] For each ring \textit{r}, correct members only accept gossip from their neighbors in each ring \textit{r} which are considered live.
+\end{description} 
+After converging to the same view, participants will only try to gossip with their correct neighbors.
+Thereby, discarding traffic originating from malicious or simply incorrect nodes.
+As a result, participants will disconnect gossip channels upon a change in neighbors, where the old neighbors either crashed or is temporarily unavailable.
+Upon resurfacing, a peer re-integrates into the network by proving his liveness, only then will participants accept gossip connections from him.
+To prove his liveness, the peer has to rebuttal the accusation that was created when he disconnected.
+When contacting his old neighbors, they should inform him of the accusation concerning him, such that he can rebuttal it, and thus re-integrate into the network.
+
+
+\subsection{Rings}
+A ring consists of all members in the Fireflies network organized in pseudo-random order \cite{flies}, an example of a gossip mesh is shown in \autoref{rings}.
+Each ring have a different ordering of members to enforce diverse gossip partners and monitors.
+Random gossip partners are essential for providing the high probability of convergence property of gossip protocols.
+All participants gossip with their closest neighbors in each ring, namely, their successor and predecessor.
+Also, participants monitor their successor on each ring.
+In \autoref{rings} member \textit{A}'s gossip partners are highlighted in red, each one of them are either its predecessor or successor in their respective ring.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.3]{rings.pdf}
+	\caption{An example of a gossip mesh consisting of three rings. All members colored in red are neighbors of member A, forming its set of gossip partners.}
+	\label{rings}
+\end{figure}
+
+With different monitors in each ring, Fireflies guarantee, with high probability, that all participants have at least one correct monitor.
+A node \textit{p} can disable rings with misbehaving predecessors by setting the appropriate bit in the mask bitmap in its own \textit{note} to zero.
+By disabling a ring, all other nodes will ignore accusations concerning \textit{p} originating from the disabled ring as presented in rule 7.
+\begin{description}
+\item[Rule 7] An \textit{accusation} is only valid in ring r if the bit corresponding to r's ring number in its contained note is enabled. 
+\end{description}
+
+Hence, preventing corrupt nodes from generating additional traffic by repeatedly accusing their successors.
+However, a node might disable all of its rings by accident, or a corrupt one might disable all on purpose.
+Therefore, Fireflies impose an upper limit on how many rings can be disabled at any given time \cite{flies}.
+The amount of rings \textit{k} can be formulated as $k = 2t + 1$, where \textit{t} is the upper bound on ring deactivation.
+From this Fireflies presents rule 6:
+
+\begin{description}
+\item[Rule 6] A \textit{note} is only valid if the contained bitmask is of length 2t + 1 and at most t of the bits are disabled.
+\end{description}
+As a result, correct nodes cannot deactivate all their rings by accident and corrupt ones cannot deactivate all on purpose.
+For example, with 11 rings, participants can only deactivate 5 rings.
+If a node wants to disable ring \textit{a}, but has reached his deactivation limit, he reactivates another ring and deactivates \textit{a}.
+This is done in a round-robin fashion, not prioritizing any rings.
+However, this could be extended by keeping a small history log for each ring, where nodes could prioritize deactivating rings with a higher frequency of misbehaving monitors.  
+Thus, punishing byzantine or corrupt nodes further.
+
+
+\chapter{Ifrit - A Go Fireflies Library}\label{chap:ifrit}
+This chapter describes Ifrit,\footnote{https://github.com/joonnna/ifrit} a \gls{go} implementation of the Fireflies protocol, which improves on several deficiencies in the reference implementation presented in \cite{flies}.
+First, it was implemented as a daemon process without a clear public \gls{api}, making it hard to build applications on top of it.
+Second, it was implemented in Python with weak concurrency support, communicating with multiple peers concurrently is important for peer-to-peer systems. 
+We therefore re-implemented it in \gls{go}, which is a statically typed language with builtin concurrency features.
+Ifrit provides an intrusion-tolerant overlay network were peers agree upon liveness of participants even in the presence of byzantine members.
+The set of live peers form a connected graph where the diameter between two peers is logarithmic in the number of participants.
+Hence, all peers are connected and have a full membership view of the system, which eventually converges with high probability. 
+Ifrit provides four services; membership, gossip, signature and a messaging service. 
+The overall architecture is shown in \autoref{arch}, with definitions of external interfaces.
+All internal interfaces combined implement the Fireflies protocol and maintain membership information. This is done regardless of application interactions through the external interfaces.
+\begin{figure}[H]
+	\centering
+	\hspace*{-2cm}
+	\includegraphics[scale=0.4]{service.pdf}
+	\caption{Architectural overview of Ifrit.}
+	\label{arch}
+\end{figure}
+
+\section{The Membership service}
+Most distributed system relies on some membership mechanism to discover other participants.
+Existing systems often employ partial membership view protocols, where each peer only knows a subset of participants.
+Hence, messages has to be routed through the overlay network to reach its destination, increasing the probability of encountering a byzantine or corrupt participant at each hop.
+Systems such a Pastry~\cite{pastry} and Chord~\cite{chord} employ partial membership, where peers route messages based on consistent hashing \cite{consthash}.
+The main argument of partial membership is the increased scalability compared to maintaining full membership.
+However, both Fireflies~\cite{flies} and~\cite{onehop} have shown the feasibility of maintaining full membership.
+With full membership, applications can send messages directly to their destination.
+
+Ifrit's membership service provides applications with the current live view of the system.
+We expose an endpoint where peers can retrieve the addresses of all participants currently believed to be alive.
+This is the primary purpose of Ifrit, providing a \gls{bft} full membership view.
+Participants that stop responding, either by temporarily becoming unavailable or crashing are removed from the live view.
+Hence, our live view only contains active participants.
+As of now, our membership endpoint retrieves all live members, hence, each time the application needs an updated view it has to fetch the entire membership.
+Ideally, we want to provide both the option of fetching the entire view and periodically receive updates concerning leaving and joining peers.
+We could implement incremental updates as a subscription based service, where applications subscribe to membership changes.
+Each time a peer joins or a live one crashes, the application could be notified with a message containing the peers address and live status.
+
+Ifrit maintains three structures for membership management: a full view, a live view, and a set of ring structures.
+The full view contains all peers ever observed that possessed a valid certificate.
+The live view is a subset of the full view, containing only the peers believed to be alive.
+Finally, the ring structures are used for gossip and monitoring purposes.
+A peer's position within the rings determines his gossip partners and monitoring responsibilities.
+Rings contain all peers present in the live view, and the number of rings used is a configuration variable determined at startup.
+Hence, peers are removed and added to the rings depending on changes in the live view.
+Furthermore, rings facilitate accusation invalidation, when adding a node to a ring, gaining a predecessor \textit{p} and successor \textit{s}, if there exist an accusation concerning \textit{s} issued by \textit{p} it can simply be removed due to it becoming invalid since \textit{p} is no longer the direct predecessor of \textit{s}.
+The pseudo code can be seen in \autoref{lst:addlive}.
+
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Adding of live peers.]%
+		Adding of live peers.%
+	}, label={lst:addlive}, style=linenumbers]{addlivepeer.go}
+\end{code}
+
+
+Upon receiving a new valid certificate, participants create a local peer representation and add it to their local full view.
+The new certificate is included in participants' gossip set, however, the peer is not considered live.
+A peer is not considered live before participants have both a valid certificate and note from the respective peer.
+Upon receiving a valid note, the peer is added to the live view and ring structures, hence, it its now considered live.
+When viewed as live, neighboring peers will open gossip connections and the peer will eventually learn of all other participants in the network. 
+Since Ifrit provide a full membership view, and peers can deterministically determine who they should be gossiping with, a peer that is considered live by the network will always be contacted by his neighbors.
+
+
+
+\subsection{Joining the network}
+To join an Ifrit group, a peer \textit{i} sends a certificate signing request to the \gls{ca}.
+If accepted to join the group, the \gls{ca} responds with a signed certificate, and a list of certificates of peers already participating in the network.
+\textit{i} then contacts the closest neighboring peer in the list received from the \gls{ca}, which in turn finds his actual neighbors.
+Finally, peer \textit{i} can contact his appropriate neighbors and integrate into the network.
+Our \gls{ca} acts as an entry point into the network, supplying new peers with certificates of existing participants.
+Peers discover other participants through gossiping with the peers belonging to the supplied certificates.
+The process of joining the network is depicted in \autoref{fig:join}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{join.pdf}
+	\caption{Process of joining the network. 
+		(1): \textit{I} sends a certificate signing request to the \gls{ca}. Receives certificates of participating peers \textit{G, F, E}.
+		(2): Tries to gossip with the closest neighbor \textit{G}, which finds his neighbors since he has not seen him before. Returns certificate and notes of his appropriate neighbors, \textit{A, H}.
+		(3): \textit{I} contacts his neighbors (\textit{A, H}) and integrates into the network.}
+	\label{fig:join}
+\end{figure} 
+
+
+Peers already participating in the network are responsible for helping new members integrate into the network.
+A key consideration is therefore how much resources existing participants allocate to help integrate new peers.
+If we dedicate too much, adversaries could exploit this by repeatedly contacting participants, depleting resources.
+We want to evenly distributed resources among our neighbors, and occasionally help new peers integrate, but with a low amount of resource cost.
+Our solution is as follows; existing participants help newly joined peers integrate by finding their appropriate neighbors.
+More specifically, certificates and notes of their neighbors are returned in the gossip response.    
+The flowchart of a gossip interaction is shown in \autoref{gos}.
+We deem finding their neighbors a small task, which only includes determining their appropriate position in each ring.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{messages.pdf}
+	\caption{Flow of gossip interactions.}
+	\label{gos}
+\end{figure}
+As depicted in \autoref{gos}, if we have observed a peer before (it is present in our full view) we reject his request.
+If an adversary gossips with a non-neighboring peer \textit{a}, and \textit{a} has not seen him before, \textit{a} will find his neighbors and include the adversary's' note and certificate in his local gossip set. 
+Thereby, other participants will eventually learn of the adversaries existence, thus, if he tries to contact another non-neighboring peer that has received his certificate, that peer will reject him.
+
+
+\subsection{Rejoining after crashing}
+A peer might crash or temporarily become disconnected from the network. 
+When detecting an unresponsive peer, accusations are created and disseminated.
+Upon receiving a valid accusation, a local timeout is started, associated with the accused participant.
+If the participant was already considered crashed or has not been observed before, the accusation is discarded.
+If the timer expires before receiving a rebuttal, the peer is removed from the live view and ring structures, but is still kept in the full view.
+When the peer becomes available again he contacts his neighbors, learns of the accusations concerning himself, rebuttals them and thus rejoins the network.
+However, there are scenarios where the rejoining peer will be rejected by his neighbors.
+While the peer was unavailable, new participants might have joined the network and become the new neighbors of the peer's previous neighbors, as shown in \autoref{fig:rejoin}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.35]{rejoin.pdf}
+	\caption{Process of rejoining the network after being crashed. \textit{A} is not aware of his new neighbors after resurfacing. Upon contacting his old neighbors, they inform him of the accusations associated with him. Subsequently, \textit{A} rebuttals the accusation, learns of his new neighbors and rejoins the network.}
+	\label{fig:rejoin}
+\end{figure} 
+Here, peer \textit{a} becomes unavailable and does not learn of the accusation concerning himself.
+Before rejoining, peer \textit{i} and \textit{j} joins the network, and becomes the new neighbors of peer \textit{h} and \textit{b}.
+When peer \textit{a} contacts \textit{h} or \textit{b}, he is rejected due to not being their neighbor and having previously been observed.
+Since \textit{a} does not learn of his accusation, a rebuttal is not initiated.
+Also, \textit{a} is unaware of \textit{i} and \textit{j's} existence since he has none to gossip with.
+Hence, he will remain crashed in other participants view, and unable to contact his neighbors.
+
+We solve this issue by extending our observed check to include whether the contacting peer is accused. If so, we send back the accusations concerning him.
+Subsequently, the peer will issue a rebuttal, and at the next gossip interaction he will present his new note, which invalidates the accusations.
+Note that the contacting peer's note will always be evaluated, even if the interaction is rejected. 
+The validation algorithm is shown in \autoref{lst:evalnote}.
+
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Note evaluation.]%
+		Note evaluation.%
+	}, label={lst:evalnote}, style=linenumbers]{noteeval.go}
+\end{code}
+
+
+Hence, when the peer retries to contact his former neighbors, the new note will invalidate previous accusations.
+After invalidation, the new note will be disseminated throughout the network, invalidating accusations at all other participants.
+As a result, the peer will be re-included into the live view and rings at all other participants. 
+
+
+\subsection{Failure detector}
+Peers are assigned monitoring responsibilities to remove crashed members from our live view.
+Each participant monitors their successors by periodically pinging them, if a specified timeout is exceeded the ping fails, if this occurs more than a set limit the successor is considered dead.
+To prevent the forging of pong responses, each ping contains a random generated nonce value, pong responses contain the signature of this nonce.
+If the signature is not valid, the ping is considered failed.
+Thereby, malicious peers cannot forge ping responses to keep dead peers in the live view of honest peers.
+
+Upon detecting a crashed peer, the accuser generates an accusation and adds it to the local gossip set.
+It will then be included in all the following gossip interactions and spread throughout the network.
+Only the direct predecessors of a given peer \textit{p} can issue valid accusations for \textit{p}.
+With high churn in the network, peers might disagree on the current system view, resulting in disagreement concerning the validity of accusations.
+However, participants will eventually converge to the same view when the churn ceases.
+
+The ping protocol used in the original implementation~\cite{flies} adopts the ping timeout according to previously recorded latencies. 
+Hence, it does not rely on a set timeout shared across all connections.
+A hard timeout approach is sub-optimal since latencies will differentiate between connections in a distributed environment.
+Ifrit does not implement the ping protocol specified in \cite{flies}, and relies on a set timeout for all connections.
+This a drawback of the implementation, and the ping protocol or another approach should be implemented in future work.
+Pinging in Ifrit is done over \gls{udp} and relies on a set timeout, after a set amount of failed pings a node is considered to be crashed.
+As a result, Ifrit might generate more false accusations by not regulating the timeout per connection compared to the previous implementation \cite{flies}.
+
+Our failure detector is agnostic of the underlying pinging procedure, hence, any implementation can be provided.
+We implemented the pinging procedure using \gls{udp} due to its lower complexity compared to \gls{tcp}.
+
+
+
+
+\section{The Gossip service}
+Participants gossip through secure channels, where peers are securely identified by their signed certificate.
+By having a trusted \gls{ca} and communicating over secure channels, Ifrit resists Sybil attacks~\cite{sybil}.
+All participants maintain a secure gossip channel with neighboring peers, as described in \autoref{chap:fireflies}.
+After establishing a secure connection, gossip channels are reused until a change of neighbor or disconnection.
+In the case of disconnection, the neighbor will be re-dialed periodically until either he responds or a new neighbor replaces him.
+Peers periodically reconcile membership state with neighbors through these channels.
+When peers gossip, they pick a Ifrit ring in a round-robin fashion and gossip with both neighbors on that particular ring.
+Hence, with \textit{n} rings, peers will have gossiped with all their neighbors after \textit{n} rounds of gossip.
+Our gossip interval is a configuration variable, with the default set to 10 seconds.
+This is a rather aggressive approach, and we envisage that applications can configure this interval according to their needs.
+More frequent gossip results in quicker convergence, but more bandwidth usage. 
+We use \gls{grpc} for all communication and connections over \gls{tls}.
+
+Applications might want to disseminate their own gossip, which they typically would do on-top of any membership view.
+The standard approach in gossip protocols is to periodically select a random peer and reconcile information.
+With random peer selection, and other primitives, such protocols converge with high probability.
+For example, Bitcoin \cite{bitcoin} does exactly this, periodically gossiping with neighboring peers about transactions, blocks and membership information.
+Ifrit enforces diverse gossip partners through its pseudo-random ring constructions, where in each ring, all participants are organized in a different order.
+Hence, periodically gossiping with neighbors is similar to selecting a random peer from a membership view.
+Therefore, we provide applications with a gossip service, where they can add gossip content which will periodically shared with neighboring peers.    
+We effectively piggbyback application gossip on our own gossip interaction with Ifrit neighbors.
+When gossiping with neighboring peers, the provided message is included and propagated to the receiving application.
+Ifrit will include this message in each gossip interaction until the application either replaces or removes it.
+All messages and their responses are relayed through events that the application subscribes to, as shown in \autoref{fig:appgossip}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.35]{appgossip.pdf}
+	\caption{Application interaction with the gossip service.}
+	\label{fig:appgossip}
+\end{figure}
+
+The application is guaranteed that all messages received through gossip are sent by a neighboring peer in the Ifrit ring mesh.
+Peers that try to gossip with everyone for possibly devious purposes are rejected, as shown in \autoref{gos}.
+All gossip related to Ifrit internals are still propagated and processed to maintain the membership, even if the application does not attach any additional gossip. 
+We envisage that this service is beneficial for applications wanting to disseminate state in a distributed environment, similar to how Ifrit operates.
+As peers gossip at 10 second intervals by default, the provided message will be transferred over the network every 10 second.
+Therefore, applications should not include messages in the gossip service that are of significant size.
+
+We do acknowledge that this service is possible to simulate through our messaging service or application messaging primitives.
+However, its purpose is to periodically exchange information with a restricted set of peers through a secure channel.
+From our gossiping rules, we can determine which peers are allowed to contact us.
+If applications were to enforce this through an alternative messaging scheme, they would have to keep track of all gossip rings and discard messages originating from non-neighbors.
+This would also require them to know how we manage our underlying rings, or enforce their own messaging rules.
+We argue that this service provides an ease-of-use alternative to implementing restrictive messaging protocols.
+Also, Ifrit already maintains gossip connections for its own purposes, so the only cost is an increased message size per gossip interaction, instead of additional connections in an application implemented scheme.
+ 
+
+% flytt?
+\subsection{Gossip message content}
+As message size is one of the limiting properties of a gossip protocol \cite{propa}, reducing gossip content is critical for performance.
+The original Fireflies~\cite{flies} implementation supported set reconciliation \cite{set_rec} for gossip interactions, minimizing the amount of data transmitted over the network.
+Our previous Ifrit implementation did not support this, and instead transferred the entire gossip set in each interaction (all certifcates, notes, and accusations).
+We still do not support set reconciliation, but have changed our gossip approach to reduce network usage.
+Instead of sending everything, we send a set of all current known peer id's and their current note epoch, as shown in \autoref{fig:gossip_msg}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.6]{gossip_msg.pdf}
+	\caption{The contents of a gossip message, numbers refer to the sizes of each structure in bytes.}
+	\label{fig:gossip_msg}
+\end{figure}
+
+On the receiving side, we identify if the sender has any old notes and if they lack certain node id's.
+The response contains all notes we believe the sender has stale versions of, any certificates belonging to peers the sender did not know of, and all accusations as shown in \autoref{fig:gossip_resp}.
+Although corrupt peers could attack this design by repeatedly stating that they know of no other peers, this would result in the same network usage as our previous approach.
+Hence, our worst case scenario when under attack is equal to our previous design, while in a normal case scenario we reduce our network usage.
+ 
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{gossip_resp.pdf}
+	\caption{The contents of a gossip response, numbers refer to the sizes of each structure in bytes.}
+	\label{fig:gossip_resp}
+\end{figure}
+
+To further reduce network traffic, we compress all messages.
+\gls{grpc} supports compressing outbound messages, and uses \gls{gzip} by default.
+Compression presents a trade-off between \gls{cpu} usage, memory usage, and network traffic.
+In theory, Ifrit is network bound, therefore we deem this trade-off acceptable.
+Also, our deployment environment has low quality network links, which further supports enabling compression. 
+
+
+
+
+\section{The Messaging service}
+%Most overlay networks only maintain a partial membership view due to the complexity of maintaining a full one. 
+%However, \cite{flies, onehop} have shown the applicability of full membership views.
+One of the benefits of full membership views is the possibility of point-to-point messaging, without any intermediate hops.
+With Ifrit's full membership view we provide a messaging service where applications can send their messages directly to their destination.
+Addresses of other participating peers can be fetched from the membership service, and then be used to send direct messages.
+Applications can implement their own messaging scheme on-top of our membership service.
+However, we provide this service as an ease-of-use alternative to implementing a messaging scheme.
+Also, all messages are transferred over a secure connections \gls{tls}. 
+With a full membership view and storing of all participants signed certificates, we can establish a \gls{tls} connection with every participant.
+
+As network links are unpredictable and peers have different network environments, we implemented this as a asynchronous service.
+Applications subscribe to events such as incoming messages and responses, an example usage of sending a message is shown in \autoref{lst:appmsg}.  
+
+
+%This service is asynchronous, thus, all responses of outgoing messages are eventually propagated to the application through a synchronization primitive, an example is shown in \ref{lst:appmsg}.
+
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Message service.]%
+		Message service.%
+	}, label={lst:appmsg}, style=linenumbers]{msgservice.go}
+\end{code}
+
+
+A key note here is that our messaging service bypasses Ifrit communication rules, as described in \autoref{chap:fireflies}, messages can be sent to all participants and not just neighbors.
+We deem this a necessity to make the service applicable.
+If we did abide by Ifrit rules, the messaging service would become somewhat identical to our gossip service.
+However, when we allow applications to communicate with all participants, we need to consider connection management.
+If an application decides either by accident or on purpose, to message everyone in the network with a significant amount of participants, we cannot simply open connections to everyone.
+We employ a connection pool in this service, where only a fixed set of connections are allowed to operate concurrently.
+Hence, when applications send messages and exceed the max amount of connections, messages are queued until connections become available.
+Since the service is already asynchronous, this extension is feasible.
+ 
+%\subsection{Peer removal}
+%\subsection{Note evaluation}
+%\subsection{Accusation evaluation}
+%\subsection{Certificate evaluation}
+%\subsection{Timeout management}
+
+ 
+ 
+\section{The Signature service}
+All peers are required to present a certificate containing their public key and network address that is signed by a trusted \gls{ca} when contacting other participants.
+By maintaining a full membership view and storing public keys of all other participants, Ifrit is capable of verifying their signatures.
+However, applications must provide the Ifrit id of signer, such that Ifrit can verify the signature with the correct public key.
+Applications only need to include the id, which can be retrieved through our external interface, in the message they want to sign and send.
+We envisage that this service is beneficial for applications needing to verify content integrity, and we relieve them of disseminating public keys. 
+For example, if the application uses either the gossip or message service, all outgoing messages can be signed and the received verified by the signature service.
+
+One of the motivations for providing this service is that gossip protocols are inherently susceptible to data corruption \cite{gossip_promise}.
+Hence, if an application uses our gossip service to disseminate information, for example a vote table where each participant votes for a particular issue, malicious peers could manipulate other participants entries.
+By providing a signature service, applications sign their own entry, verify others and discard tampered information.
+ 
+   
+
+% copy pasta fra capstone, fjerne?
+\section{Certificate authority}
+\glsreset{ca}
+Ifrit also supplies a basic \gls{ca} implementation responsible for signing participants' certificates.
+The \gls{ca} exposes a single \gls{http} endpoint for certificate signing requests, expecting the body to contain a \textit{X.509} compliant certificate request.
+If the request body does not contain a valid certificate request, it is discarded.
+When signing certificates, the \gls{ca} is responsible for generating the Ifrit id used by participants.
+As these ids have to be unique, the \gls{ca} stores all previously generated ids to ensure uniqueness.
+Furthermore, the \gls{ca} acts as a entry point into the network by piggybacking certificates of nodes already present in the network on certificate signing requests. 
+This was done purely for simplicity and we consider the entry mechanism as an orthogonal field of research.  
+A possibility would be to distribute the \gls{ca} in similar manner as the \gls{dns} servers used for Bitcoin \cite{propa}, acting as both a \gls{ca} and \gls{dns}. 
+We do not consider vulnerabilities or attacks concerning the certificate authority implementation.
+
+%To provide an entry point into the network, the \gls{ca} has to store certficates of some participants.
+%Currently, we adopt a naive approach where the \gls{ca} stores certificates of a fixed amount of the %first peers who joins the network.
+%Thereby, if 
+
+
+As of now, our \gls{ca} does not monitor network activity, hence, its unaware of which peers are still participating.
+As a result, if all of its known peers either leave or crash, it can no longer provide an entry point into the network.
+To solve this, the \gls{ca} could periodically query its set of known peers to ensure that it always has an updated view.
+Another approach could be to simply store all certificates at the \gls{ca}, however, if the system grows to a significant size, both storage and determining who is alive becomes problematic.
+
+
+
+\section{Cryptography}
+Ifrit uses \gls{go}'s standard library for all cryptography and certificate operations, both the \gls{ca} and client implementations.
+Also, we adopt the same approach as the previous implementation \cite{flies} and use elliptic curve signatures due to its low signature length compared to \gls{rsa} and \gls{dsa}.
+As one of gossip protocol's limitations are bounded message sizes \cite{gossip_promise}, and all gossiped data structures are signed, we deem this a desirable feature. 
+
+
+%\section{Library vs daemon}
+%As of now, Ifrit is a \gls{go} library, limiting it to being used in \gls{go} programs.
+%We primarily designed it as a library out of simplicity.
+%To further improve applicability, we could implement Ifrit as a daemon service.
+%As a daemon service, Ifrit would not be restricted to only \gls{go} programs.
+%Multiple applications could potentially use the service concurrently by adding a registration mechanism.
+
+
+
+
+\chapter{FireChain} \label{chap:firechain}
+This chapter describes FireChain, a Byzantine fault tolerant blockchain protocol based on gossip.
+FireChain is based on earlier work on gossip based consensus \cite{vanblock}.
+For membership and gossip dissemination, we use Ifrit described in \autoref{chap:ifrit} as our membership and gossip service.
+
+%We will first present the protocol \cite{vanblock}, then describe our design and how we have integrated Ifrit.
+%Firechain is a blockchain implementation based on the protocol presented in \cite{vanblock}.
+%Our main objective was to explore the applicability of a blockchain based on gossip.
+%We investigate how efficient we're able to converge a set of nodes to the same state with gossip, with Fireflies as our underlying network substrate.
+%We do not investigate related security issues that may be a result of our gossip approach. 
+
+
+\section{FireChain overview}
+FireChain consensus is based on gossip based agreement, where participants vote for blocks and gossips vote tables. 
+Internally, FireChain deploys a Ifrit client responsible for joining the specified Ifrit network and relaying all communication with other FireChain instances.
+As the consensus protocol is based on gossip, relies on a full membership view, and establishing secure communication channels, we deem Ifrit a suitable network substrate due to its membership, gossip and signature services.
+Ifrit provides a full \gls{bft} membership view, where the diameter between all live members is logarithmic in the number of participants.
+Hence, we can utilize the underlying overlay network to disseminate our gossip.  
+The overall architecture is shown in \autoref{fig:firechain}.
+By leveraging Ifrit's membership and gossip service, we have a dynamic full membership view with gossip convergence guarantees for our vote table reconciliation.
+Our implementation is both oblivious to how messages are propagated and how the membership is maintained.
+As a result, our implementation was simplified by leveraging Ifrit's capabilities.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.35]{firearch.pdf}
+	\caption{Architectural overview of FireChain.}
+	\label{fig:firechain}
+\end{figure}
+
+
+
+
+\section{FireChain consensus}\label{proto}
+%\subsection{Vote table structure}
+%\subsection{Protocol}
+%\subsection{Chain management}
+%\subsection{Fork detector}
+%\begin{codecodedefinition}
+%	\lstinputcodedefinition[
+%	caption={%
+%		[Message service.]%
+%		Message service.%
+%	}, label={lst:appmsg}, style=linenumbers]{msgservice.go}
+%\end{codecodedefinition}
+
+\iffalse
+Blockchains based on \gls{pow} rely on participants continuously solving cryptographic puzzles for finding new blocks, often coupled with a fully open membership with no assumption of trust between participants. 
+Instead there are incentives to operate honestly.
+\gls{bft} chains are based on mutual trust and cooperation between participants in a closed membership environment.      
+
+The protocol presented in \cite{vanblock} coupled with Ifrit provides a configurable membership by either accepting only specific certificates or all certificates.
+By accepting certificates signed by any \gls{ca} or even self signed ones, Ifrit can provide a \textit{permisionless} environment where anyone can join.
+However, without a commonly trusted \gls{ca}, another approach is needed to resist Sybil attacks \cite{sybil}.
+Only accepting certificates from one specific \gls{ca} results in a \textit{permisioned} environment, where the \gls{ca} decides who is allowed to join.
+
+Instead of solving cryptographic puzzles or relying on trust, the protocol relies on gossip that converges with high probability.
+Participants periodically reconcile state with neighbors which eventually converges at all participants. 
+
+Our consensus protocol is based on the one presented in \cite{vanblock}.
+Instead of relying on \gls{pow} or \gls{bft} consensus, we rely on \textit{gossip} that converges with high probability.
+We divide time into \textit{epochs}, where in each epoch participants decide on the next block to be committed, hence, epoch length decides our block commit interval.
+Epochs last 10 minutes and is further split into 10-second \textit{gossip rounds}, where in each round participants gossip with \textit{k} other peers.
+
+
+\fi
+Agreement in FireChain is based on gossiping updates to the blockchain datastructure. 
+Gossip messages converges over time so that eventually every correct member will (with a high probability) have the same set.
+
+Time is divided into \textit{epochs}. 
+For each \textit{epoch} members decide on the next block to commit to the chain. 
+Hence, the epoch length in wall-clock time decides the block commit interval.
+In the current prototype, epochs are configured to be 10 minutes, split into 60 10 seconds gossip rounds. 
+Leaving peers with 60 gossip rounds to agree upon the next block.
+In each \textit{gossip round}, participants gossip \textit{k} other peers in the system.
+At the end of an epoch participants commit their \textit{favorite block} to their local chain.
+The favorite block of a participant is the block that received the majority of votes during an epoch, hence, its the most popular block.
+
+
+All participants maintain a \textit{vote table}, containing one entry per participant in the network.
+Entries effectively represent each peer's vote for the next block.
+Each entry consists of: the peer's id, an epoch, the peer's favorite block, and a signature. 
+%Favorite blocks are represented by their root hash, the preceding block's hash, and hashes of all the block's entries.
+Entries are signed by their respective creator to ensure that malicious participants cannot alter other peers' votes.
+The epoch field does not directly correlate to consensus epochs, but rather representing an increasing counter establishing the order of which block each peer favored.
+Hence, if peer \textit{n} favors block \textit{a} at epoch 5, but later on favors block \textit{b} at epoch 6, n has changed favorite block from \textit{a} to \textit{b} during this timespan.
+Thereby when we are comparing entries, we know that the one with the highest epoch is the most recent vote from the respective peer.
+ 
+In each gossip round, participants reconcile their vote table with \textit{k} other peers.
+When reconciling tables, peers adopt all entries that have a higher epoch number compared to their entry. 
+After reconciling tables, participants count votes for each block, and replaces their favorite block with most popular block in the table.
+Subsequently, incrementing their epoch counter, signaling a change in favorite block.
+If they chose the same block as they did in the previous round, they do not increment their epoch counters. 
+In the event of a tie between several blocks, one is picked at random.
+
+
+At the start of an epoch, each participant fills their local block with collected entries and sets it as their favorite block.
+After gossiping with other participants, peers will learn of other blocks and always vote for the most popular one.
+By continuously gossiping tables, participants will eventually, with high probability, agree upon the next block.
+Epochs act as a global commit timer and signals all peers to commit their current favorite block, and start the consensus process for the next block.
+Peers ignore all votes that either have a invalid signature or has a different previous block compared to them, hence, ignoring votes originating from forks.
+We will introduce possible forking scenarios and how we resolve them later on.
+A superficial representation of the protocol is shown in \autoref{lst:protocol}.
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Consensus protocol.]%
+		Consensus protocol.%
+	}, label={lst:protocol}, style=linenumbers, ]{consensus.go}
+\end{code} 
+
+
+
+
+
+
+\iffalse
+Firstly we describe how participants will end up agreeing upon a block \cite{vanblock}.
+All participants maintain a vote table consisting of all other participants, where each entry includes: a unique identifier, a gossip round number, a favorite block, and a signature to prevent tampering.
+Each entry represents a peer's vote for the next block.
+In each gossip interaction participants reconcile their tables, for each entry adopting the one with the highest gossip round number, as shown in \autoref{lst:mergepeer}.
+After each reconciliation, peers count how many votes each block in their table has, the block with the highest amount of votes is considered the most popular.  
+Then, update their own entry by incrementing their gossip round number and replacing their favorite block with the most popular one. 
+If there is a tie between several blocks, one is picked at random.
+By continuously gossiping tables, participants will eventually, with high probability, agree upon the next block.
+
+
+Now we describe how new blocks are introduced and how the chain progresses, we assume participants have access to a precise source of time \cite{vanblock}.
+Time is divided into 10 minute epochs, where participants use each epoch to agree upon a block, hence, block creation time is the same as in Bitcoin \cite{bitcoin}.
+More specifically, each participant adds their current favorite block to their local chain at each 10 minute interval.
+Thus, we need all participants to agree upon the next block before the end of each 10 minute interval.
+Epochs are further divided into 10-second gossip rounds, where in each round, participants reconcile their vote tables with \textit{k} other participants \cite{vanblock}.
+By default, Ifrit gossips with both neighbors on a ring at each gossip interval, hence, $k = 2$.
+At the start of each epoch, peers fill their local block with collected entries.
+By continuously gossiping with other peers, a peer learns of other's blocks and will always vote for the most popular one.
+Eventually a block will be favored by everyone and accepted at the end of an epoch.
+
+The protocol does not specify measures to resolve or detect forks.
+Hence, if peers disagree upon the next block at the end of an epoch, they will create one or more forks.
+Since peers ignore votes of participant's that have a different previous block, all forks will continue indefinitely. 
+We will introduce our approach to these issues later on.
+%As of now, there are no measures to resolve forks, hence, if peers disagree on the favorite block at the end of an epoch, they will diverge and create a fork.
+%Since blocks are created at fixed intervals, the main chain and forks will progress at the same speed, due to peers only accepting blocks at the end of an epoch.
+%Even if devious peers progress their fork faster than correct ones, their blocks will be rejected at honest peers due to different previous blocks.
+%A possible solution is to chose a chain based on a agreed-upon metric, such as the double hash value of the blocks in question.
+%As a result, all honest peers will follow the same chain. 
+%Although, malicious peers might construct blocks such that they have a high double hash value, effectively giving them control over the main chain.
+%However, we do not address fork resolving, hence, if peers do not agree at the end of an epoch, they will diverge. 
+\fi
+
+
+\subsection{Membership}
+\iffalse
+To execute the protocol \cite{vanblock}, we need an overlay network capable of maintaining a full membership view, since the protocol requires a vote table consisting of all participating peers.
+We could do a similar approach as Bitcoin \cite{bitcoin}, and form an unstructured overlay network and rely on flooding membership information~\cite{propa}, eventually learning of all peers.
+However, without \gls{pow} we would have no measures to resist Sybil attacks \cite{sybil}.
+Neither would we be able to determine if any peers left or simply crashed other than to regularly check everyone if they are alive.
+We deem Fireflies \cite{flies} the ideal overlay network for providing a full membership view and resisting Sybil attacks, due to its \gls{bft} nature.
+Peers that leave, crash or is byzantine will eventually by removed from our view, and thus our vote tables can be modified accordingly.
+With a full membership view, we can also send direct messages without any intermediate hops, which we will explain how we utilize later on.
+\fi
+
+
+Each Firchain instance deploys a local Ifrit client, responsible for joining a Ifrit network and maintain membership.
+To join the network, Ifrit sends a certificate signing request to the deployed \gls{ca}.
+The \gls{ca} signs our certificate and informs us of existing peers in the network.
+With our certificate we can establish secure gossip channels with existing peers and eventually learn of everyone in the network. 
+From Ifrit's membership service we can retrieve the live view of the Ifrit network.
+With this view, we can create and maintain our vote tables, which requires one entry per participant.
+Hence, our vote table will consist of all live members which we have retrieved through the membership service.  
+Peers that crash or leave will eventually be removed from the live view, and we can modify our voting tables accordingly.
+
+
+%To join the underlying Fireflies network, peers deploy local Ifrit clients and supply them with the address of the trusted \gls{ca}.
+%The \gls{ca} acts as an entry point into the system and will inform joining peers of already existing participants.
+%Eventually our deployed Ifrit client will discover all other peers within the system, presenting us with a full membership view.
+%With this view, we can create and maintain our vote tables, which requires one entry per participant.
+%Hence, our vote table will consist of all live members which we have retrieved through the membership service.  
+
+\section{Internal structures}
+\subsection{Blocks}
+Blocks contain: a merkle tree containing all entries, hash of the previous block, and a block number.
+We use a third party merkle tree implementation \footnote{https://github.com/cbergoon/merkletree}.  
+All blocks are organized in a chain, where each block links to a previous one.
+At the end of a consensus interval, peers commit their favorite block to the chain and fills a new one with entries from the pending pool for the next consensus round.
+As peers will change favorite block throughout rounds, they will receive and store additional entries in their respective pending pools, which will be included in future blocks.
+Blocks have a fixed size limit, this was done for simplicity and dynamic sizes can be further explored in the future.
+Our experiments will operate with different block sizes to evaluate how the system behaves under different configurations.
+All committed blocks are organized in a chain of blocks, representing our \textit{blockchain}.
+
+
+\subsection{Block entries}
+In our system block entries do not contain any vital data, we only want to investigate if our gossip approach is sufficient to ensure that all participants agree upon the ordering of blocks and their content.
+Hence, we do not evaluate the contents of a block entry, we only need an identifier for each entry.
+In crypto currencies, the id of a transaction is the hash of its content.
+We mimic the behavior for simplicity, each entry is a random sequence of bytes and the id is its hash.
+Entries are periodically created by each FireChain instance and added to their local pending pool. 
+We deem it trivial to add data validation in future work as all other structures are in place.
+
+In Bitcoin~\cite{bitcoin}, the miner decides which transactions should be included in their newly found block and their ordering.
+Since we do not have miners, we need another mechanism to ensure that all agree upon the ordering of entries within a block.
+One could add entries in the order they are received.
+However, blocks with different entry ordering result in different merkle root hashes, hence, they are not considered equal.
+As a result, peers could populate their favorite block with the same entries, but consider other blocks with the same content as a completely different block.
+Therefore, we sort all entries in a block based on their hash values.
+If all peers sort their entries in the same manner, equal entries will result in an equal merkle root hash.
+Since our entries contain no vital data, and they have no relevance to each other this approach is feasible.
+When peers fill their local block, they first chose a set of random entries from the pending pool, then sort them.
+Thereby, we avoid favoring entries that have low hash values.
+%If multiple Bitcoin transactions are dependent on each other and are placed in the same block, their ordering is decisive for validity of the block.
+
+\subsection{Vote tables}
+Vote tables contain all participating peers, and each entries' structure is shown in \autoref{fig:entry}.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.55]{entry.pdf}
+	\caption{Structure of a vote table entry, numbers refer to their placement within the structure.}
+	\label{fig:entry}
+\end{figure}
+Each peer uses their deployed Ifrit client's id as their vote table \textit{id} since they are already unique.
+To identify what block entries each favorite block consists of, we include hashes of all block entries in vote table entries.
+Thereby, peers can identify which block entries is missing from their local storage.
+The \textit{roothash} field represents the merkle tree root hash of the block's entries, and \textit{prevhash} represents the previous block's hash.
+By adding signatures, entries are tamper-proof, as mentioned earlier.
+
+
+Vote tables are reconciled by, for each entry, adopting the one with the highest epoch, as shown in \autoref{lst:mergepeer}.
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Reconciling vote tables.]%
+		Reconciling vote tables.%
+	}, label={lst:mergepeer}, style=linenumbers]{mergepeers.go}
+\end{code} 
+
+
+
+\section{Entry pools}\label{sec:pools}
+As multiple blocks might have overlapping entries, we want a mechanism to temporarily store them to avoid needlessly requesting them repeatedly.
+If we simply discard all entries we are currently not favoring, we might need to request them later on due to changing favorite block.
+We effectively need a caching mechanism for block entries, trading memory storage for network usage.
+
+Peers maintain several memory pools of block entries: pending, favorite, missing, and confirmed entries, as shown in \autoref{fig:firechain}.
+The pending pool has a default size limit of 10 blocks and contains entries that have not yet been included in an accepted block, similarly to Bitcoin \cite{bitcoin}.
+The favorite pool contains the hashes of all entries that makeup the current favorite block, and the missing pool contains the hashes of the favorite entries that are currently missing from local storage.
+As peers change their favorite block, both the favorite and missing pool is reset and populated according to the content of the new block.
+Some entries might already be present in the pending pool, those lacking are added to the missing pool.
+Finally, the confirmed pool contains all entries that have been included in accepted blocks.
+Currently, FireChain does not persist blocks, they are only stored in the confirmed pool and in their respective blocks.
+Since our entries do not actually store any vital data, we deemed adding persistence a low priority.  
+If FireChain is to be used, it is necessary to add support for persisting blocks. 
+
+% mekke en figur?
+Both the missing and favorite pool do not store entry content, only hashes.
+Hence, the missing pool reflects which entry hashes are currently in our favorite pool, but their content is lacking from the pending pool.
+In the scenario where a peer receives entries present in the missing pool and the pending pool is full, a random entry which is not present in the favorite pool is evicted from the pending pool.
+Thus, all entries present in the favorite pool have a priority in the pending pool.
+Since our favorite pool contains the hashes of entries in the current favorite block, the combined content size of its entries cannot exceed the blocksize. 
+As a result, in a worst case scenario where a new favorite block is chosen with no overlapping entries with the pending pool, one blocksize of entries are evicted from the pending pool.
+With our memory pools, peers can identify which entries are currently in local storage, which ones are currently favored and those lacking to complete our favorite block.
+
+Introducing memory pools can directly open for a \gls{dos} attack, where the adversary attempts to fill all participants pools with their own entries.
+However, since we prioritize our favorite block, an adversary cannot fill a participants pool with his own entries that are not currently favored by the participant.
+Peers will simply evict enough entries to make room for his favorite entries.
+Also, peers will only add entries in their memory pool that was at one point in time included in their favorite block.
+Hence, an adversary cannot simply generate entries and try to disseminate them amongst participants.
+  
+   
+
+
+
+\section{Gossiping vote tables \& block entries}
+%Following the protocol \cite{vanblock}, we need to periodically gossip with other random participants in the network.
+%We need to enforce random gossip partners since gossip protocols rely on it for convergence probability \cite{gossip_promise}.
+%With our full membership view we could randomly gossip with peers in our view. 
+%However, since Ifrit already arranges all peers in a pseudo-random mesh for the exact same purpose, we would rather utilize its gossip service than to design our own random peer selection scheme.
+%Also, Ifrit already has secure gossip connections with neighboring peers, there is no reason to implement our own messaging scheme, thus, we avoid establishing additional connections.
+%Instead, we utilize Ifrit's gossip service to piggyback our state on Ifrit's internal secure gossip interactions.
+%With Fireflies' guarantees that correct peers will be connected with high probability, we can safely assume that our gossip will eventually spread to all correct participants. 
+
+We need to enforce random gossip partners since gossip protocols rely on it for convergence probability \cite{gossip_promise}.
+With our full membership view we could randomly gossip with peers in our view. 
+However, since Ifrit already arranges all peers in a pseudo-random mesh for the exact same purpose, we would rather utilize its gossip service than to design our own random peer selection scheme.
+We use to Ifrit's gossip service to disseminate vote tables and block entries.
+However, a peer might try to gossip with everyone to increase the chances of their block being chosen.
+The gossip service guarantees that all incoming messages were sent by a neighboring peer in one of the underlying Ifrit rings.
+Hence, if a peer tries to gossip with someone who is not their gossip partner, the interaction is rejected, as described in \autoref{chap:ifrit}.
+Thereby, peers cannot manipulate our voting scheme through gossiping by everyone.
+
+We refer to the message attached to the gossip service as our \textit{state}, which will be transferred to our neighbors periodically by the service, subsequently reconciling their states. 
+Upon a change in state, the gossip service is updated with the new state to be disseminated.
+A change in state does not append another message to the service, it replaces the previous one.
+We will now present our design process of what our state consists of in incremental steps, before finally showing our final approach.
+
+Initially, our state contained the entire pending pool of block entries and a vote table.
+However, each participant's pool could grow indefinitely since the pool had no size limit.
+As a result, gossip messages between participants would also grow indefinitely in size.
+To resolve this issue, a maximum size of the pending pool was imposed on participants, ensuring that gossip messages would never exceed the maximum memory pool size.
+However, this approach was not feasible since some entries might not be propagated throughout the network due to all participants having maxed out their memory pools.
+Peers need to have all block entries that could be included in the block to be chosen in the current epoch.
+We then instructed participants to continuously ask their neighbors for entries in their favorite block.
+However, with 300 participants and 1 \gls{mb} blocks, each participant would have to receive and store 300 megabytes of data per epoch in a worst case scenario where no blocks have overlapping entries.
+To reduce network usage, participants only ask neighbors for entries they lack to complete their own favorite block, instead of all entries of everyone's favorite block.
+More specifically, each peer asks their neighbors for all entries in their missing pool.
+As the network converges, all participants will eventually have the same favorite block, and everyone will have received its content.
+Hence, we will still fulfill our constraint that participants need to have all block entries of the block to be chosen in an epoch.  
+At the point of convergence, everyone's missing pool will be empty and no further transfer of entries is necessary.
+
+To determine which entries each block in the table consists of, each entry contains all entry hashes of the blocks content.
+The total size of a vote table entry with a block consisting of 10 entries would be 486 bytes.
+With 100 participants, the entire table would then be 48.6 \gls{kb}.
+We initially added the entire table to the gossip service, where it would be sent over the network at each gossip interaction.
+Participants would then adopt specific entries as according to the protocol. 
+Ifrit will by default compress all outgoing messages, reducing our network usage. 
+However, we wanted to reduce it further.
+Firstly, we made a small change to the protocol, instead of incrementing our epoch number after each reconciliation, we only increment it after changing favorite block.
+We still add our entire table to the gossip service, however, each entry only consists of: id, epoch and the block's merkle root hash.
+Entry size is now reduced to 68 bytes, and with 100 participants amounts to 6.8 \gls{kb}.
+On the receiving side, the participant checks whether the sender has any stale entries by checking epoch numbers and merkle hashes.
+If there any stale entries, their full versions (the one showed in \autoref{fig:entry}) are transferred back.
+Since the receiver does not adopt any entries, messages do not need to include signatures.
+They are transferred when stale entries are detected, likewise for entry hashes.   
+
+Our state consists of a reduced vote table, and the missing pool explained in \autoref{sec:pools}.
+We subscribe to incoming messages and responses by registering handlers in the gossip service, where our message handler is expected to return a response. 
+Our registered event handlers pseudo code is shown in \autoref{lst:callbacks}, which will be invoked on each received message and response.
+
+\begin{code}
+	\lstinputcodedefinition[
+	caption={%
+		[Gossip callbacks.]%
+		Gossip callbacks.%
+	}, label={lst:callbacks}, style=linenumbers]{callbacks.go}
+\end{code}
+
+
+In our initial design, when participants converged, they would still exchange full voting tables.
+With our optimization, we only transfer 68 bytes per participant after convergence.
+Even before convergence we only transfer stale entry values, reducing our network usage significantly.     
+Additionally, participants would exchange significant amounts of block entries, even if they already had all block entries associated with their favorite block. 
+As gossip protocols are inherently bound by message sizes \cite{gossip_promise}, we deem this a significant improvement to our previous design. 
+ 
+As mentioned in \autoref{chap:ifrit}, when using the gossip service, messages should not be of significant size.
+We observed slow peers with our initial design choices due to extensive network usage.
+Both due to responses growing indefinitely and large vote tables.
+By changing our gossip approach, we fetch a maximum of one block of entries and the size of vote table entries reduced significantly.
+
+
+
+\section{Resolving forks}
+Forks occur when one or more participants create a branch of blocks separate from the main chain.
+Bitcoin~\cite{bitcoin} resolves forks by participants always following the longest chain.
+Hence, the main chain will always be the set of peers with majority of computing power.
+However, it is not clear which branch is the main chain at point of forking, since they are equal in length.
+It takes time before the main chain out-paces other branches.
+This is one of the reasons Bitcoin developers recommend waiting until your transaction is 6 blocks deep before considering it permanently committed \cite{propa}.
+Another approach introduced by Ghost~\cite{ghost}, proposes weighting each branch not just by its length, but by its subtrees.
+If a branch has significant amount of subtrees, it is more probable that its the main chain since there is probably more peers working on that branch.
+%This approach has later been adopted by Ethereum\cite{ether}.
+
+As our consensus protocol is not based on \gls{pow}, forks are not created by multiple miners finding the next block simultaneously. 
+One or more forks are created if peers disagree at the end of an epoch, whether it happens by accident or due to malicious participants.
+During development, we found that a frequent cause of forks was peers temporarily becoming unavailable, not being able to contact or be contacted by other participants.
+Isolated peers would then progress their own local chain, oblivious to other peers in the network.
+Since they were "alone", their own vote was enough to commit block after block.
+When becoming available again and rejoining the network, they would have a personal branch and would ignore other's blocks due to having different previous blocks.
+Likewise for other participants, rejecting the re-emerged peer's blocks due to different previous blocks.
+
+To resolve forks, we utilize our full membership view combined with our vote tables.
+After rejoining the network, peers will learn of the current block proposals through reconciling vote tables.
+By examining updated vote tables, peers can identify if a majority of the network is on a different branch.
+Since each vote table entry contains the previous block, we deem that every participant with a different previous block is on a separate branch.  
+If a majority of the network (over 50\%) is on a different branch, peers contact a random participant in that majority and presents him with his local chain.
+We only send the hashes of each block with no content, since the receiver only needs to identify where the fork occurred.
+The random participant then inspects where the fork occurred and sends back all the blocks beyond that.
+Subsequently, the receiver evaluates the proposed chain and replaces his own if valid.
+As we select a random participant in the majority, we might contact a byzantine or corrupt peer, which in turn could present his own "secret" fork.
+However, if we receive a secret fork that is not the main chain, we will simply detect this as another fork and the process is repeated.
+An obvious drawback of this approach is if the network is split into two equal partitions, hence, there is no majority.
+To improve on this, we could add a tie-breaker rule, such that all honest peers would at least follow the same chain.
+As peers in the majority might not be one of our neighbors, we cannot contact him directly through the gossip service.
+We also rely on this direct message to be through a secure channel.
+Ifrit provides us with a message service where we can send direct messages to anyone in the network over secure \gls{tls} connection.
+Peers utilize this service to resolve forks, reliving us of implementing our own direct message scheme.  
+
+Another approach could be to contact a set amount of peers in the majority and confirm their chain representation from multiple sources before committing.
+This would, however, incur additional overhead and it is essentially what we do by repeating the process, just with a significantly better best-case performance.
+For example, if we were to contact 2/3 of the majority before committing, with a total network of 1000 and a majority of 900, that would be 600 messages.
+Instead we only send one message, and repeat the process if the received chain is a fraud attempt.
+This is only plausible due to our full membership view, with a partial view, we would not be able to accurately estimate what the majority of the network favored since we do not know its full size.
+Also, contacting someone in that majority, if not in our partial view, would have to travel several hops between peers to reach its destination.
+Increasing the chance of encountering a byzantine or corrupt peer at each hop.
+
+An adversary attempting to create a fork in Bitcoin~\cite{bitcoin} could attempt to out-pace the main chain if he is in possession of the majority of computing power.
+Hence, invalidating the main chain's progression in favor of his own blocks.
+Peers in FireChain do not produce \gls{pow} to progress the chain as in Bitcoin, but collectively agree on the next block within a fixed time frame.
+Hence, a branch with only one honest member would progress at the same pace as the main chain.
+An adversary could produce blocks at a rate only bounded by the rate of which he can produce and disseminate them.
+However, these blocks would not be accepted by honest participants as they only commit blocks per fixed interval and commit the one which is most popular.
+This leads to the possibility of performing a Sybil attack~\cite{sybil}, where adversaries allocate a significant amount of identities to gain influence and control a distributed system.
+However, Ifrit's membership service already solves this issue as explained in \autoref{chap:ifrit}.
+Adversaries could, however, refuse to forward gossip information or simply vote for random vote table entries that are not popular.
+Aiming to cause confusion among honest peers, preventing them from agreeing on the next block.
+To withstand such attacks we rely on our gossip converging at honest members.
+
+Adversaries can simply pool their votes together and vote for their block, effectively controlling chain content.
+Content would still have to be valid, however, they could starve all other participants by not letting them commit their entries, rendering the system useless for all other peers.
+Honest participants will follow the most popular block, and if 30\% of the network is corrupt, it is highly probable that their block will be chosen every round.
+We currently do not have any countermeasures, however, a \gls{pos} hybrid approach could prevent this attack.
+If votes were weighted by participants current stake in the system, adversaries would at least have to own significant amounts of stake before they can control chain content.
+Current systems employing \gls{pos} \cite{algorand, provepos} select a committee based on participants' stake in the system.
+The committee either collectively agrees upon the next block or elect a leader responsible for deciding the next block.
+We would not elect a full committee, and rather weight a stakeholder's vote higher than that of peers with no stake in the system.
+Alternatively, participants could only consider votes originating from stakeholders.
+With a full membership view, peers can identify who currently is in possession of the most stake.
+Non-stakeholders would effectively only be disseminating gossip.
+
+
+Also, the adversary could create a fork originating arbitrarily in the distant past.
+From this fork he can produce enough blocks to match the length of the main chain.
+When at the same length and with the majority of votes, the adversary can re-write history by introducing his fork.
+As generating blocks is trivial without \gls{pow} the attack is feasible. 
+However, the adversary must control the network majority.
+We do not have an effective solution for when a majority of the network is corrupt.
+However, we envisage that corrupt participants could be detected and their certificates revoked, effectively removing them from the membership.
+This would have to be enforced by Ifrit, but could be detected by FireChain.
+
+
+
+
+\section{Signature service}
+%In our system, we are 
+%Gossip protocols are susceptible to data tampering \cite{gossip_promise}, 
+%In our system, peers are effectively re-publishing other participants votes.
+%Hence, without any mechanism to verify gossip content, peers can modify votes of other participants.
+%To solve this, the protocol \cite{vanblock} adds a signature to each vote entry.
+%As 
+Gossip protocols are inherently susceptible to data tampering \cite{gossip_promise}, since participants effectively republish other peers messages, they can easily be altered by an adversary.
+To prevent this, we require a signature per vote table entry.
+Verifying private key signatures, requires each peer to store and disseminate all participants public keys.
+Ifrit already disseminates public keys of all participants for its own purposes and provides a signature service, reliving us of disseminating public keys.
+Thereby, Ifrit can verify any private key signature created by anyone participating in the network.
+We utilize this service to sign our own entry and verify all vote table signatures.
+
+
+
+%As mentioned, vote table entries contain a signature to prevent tampering, these signatures are verified by Ifrit's signature service, relieving us of propagating and storing public keys.
+%Upon receiving another peers vote table, we adopt each entry that has a higher gossip rounds number coupled with a valid signature.
+%The signature service is also used to sign our own local entry.
+%Since Ifrit already disseminates our public key, all other participants will be able to verify our signature.
+%Thus, preventing malicious peers from manipulating our vote entry, possibly claiming that we favor their block.
+
+
+ 
+
+%Initially only maintained single pending and confirmed pool, hard distinction between pending and favorite entries(currently being favoured locally).
+%Added favorite pool and missing pool, quick lookups, more logical setup etc.
+
+  
+
+
+%One of the important attributes of this solution is that, when a participant has all the necessary entries for the current round, traffic concerning block entries, either requesting or transferring, ceases.
+
+
+
+
+  
+\chapter{Evaluation}\label{chap:evaluation}
+In this chapter we evaluate FireChain by investigating how many rounds of gossip are required for the system to converge.
+We run several experiments for different scenarios to investigate various aspects of FireChain's performance.
+
+In some cases during our experiments, certain members became isolated or disconnected from the system, unable to send or receive messages from the other peers.
+Such partitioned members may create forks in the blockchain when reconnecting with system, and report back that they converged on their own branch in 0 rounds.
+We discard these measurements and ensure that they resolved their fork and continued on the main chain.
+Also, we discard measurements originating from forks created by subset of participants.
+We are only measuring the convergence of the main chain, and we ensure that participants eventually resolve their forks and rejoin the main chain. 
+
+
+\section{Experimental platform \& setup}
+All experiments and most of the testing and development were done on PlanetLab. 
+PlanetLab\footnote{https://www.planet-lab.org/} is a global research network maintained by several academic institutions, supporting development of new network services, consisting of 1353 nodes distributed across 717 sites.
+Sites are distributed worldwide including: France, Germany, Norway, Italy, and Spain. 
+PlanetLab provides a distributed environment spread across the world with different network environments, which are the desired characteristics for testing our implementation.
+
+With PlanetLab's high diversity in network environments and commodity hardware, we argue that our experiments are conducted in a real world setting where hosts regularly crash or disconnects, which we often experienced in development and testing of both FireChain and Ifrit.
+PlanetLab nodes have a minimum bandwidth requirement of 400 \gls{kbps}. \footnote{https://www.planet-lab.org/node/222}
+
+PlanetLab provided us with 48 nodes distributed all over Europe with high diversity in network environments.
+Experiments were orchestrated from our local machine at the \gls{uit}.
+Our \gls{ca} was deployed on the same node in all experiments and was redeployed before each experiment.
+FireChain instances were deployed on all nodes followed by a 30 minute waiting period to ensure that all nodes had converged to the same view and start up traffic had ceased.
+As we only have 48 hosts, multiple FireChain instances were deployed evenly across all hosts.
+FireChain instances are also responsible for creating block content.
+The chain of events in each experiment deployment can be seen in \autoref{expstep}.
+\begin{description}\label{expstep}
+	\item[Step 1] Deploy the \gls{ca}.
+	\item[Step 2] Deploy FireChain instances on all PlanetLab nodes.
+	\item[Step 3] Wait 30 minutes to ensure the underlying Ifrit clients have converged.
+	\item[Step 4] Start experiment by sending a start request to all instances.
+	\item[Step 5] After each epoch, peers report back their convergence number for that epoch to our orchestrator at \gls{uit}.
+	\item[Step 6] Let the chain progress 50 blocks (50 epochs).
+	\item[Step 7] Shut down the \gls{ca} and FireChain instances.
+\end{description}
+We rely on all FireChain instances starting approximately at the same time, and deem the latency between each participant receiving the start request acceptable. 
+Each instance records how many gossip rounds it uses to settle on each block.
+By collecting all instances' round number for each block we can determine their convergence time for each block by inspecting the highest round number.
+The highest round number recorded represents when the entire network agreed upon the block.
+We also ensure that each participant has converged to the same blockchain state by inspecting each participant's chain.
+For each experiment deployment, we measure the average amount of gossip rounds required for convergence.
+
+We could have deployed our experiments on \gls{aws}, providing us with significantly increased network connectivity and possibly better hardware.
+Or we could create a simulated environment, and add latencies as we see fit.
+However, by deploying on PlanetLab we are closer to a real-life scenario, where crashes and network outage are the default and not a rare occasion.
+Since PlanetLab is distributed across the entire globe, network latencies are high and connectivity low, which was experienced first-hand during development and experiments.
+We frequently received messages from PlanetLab support due to our excessive network transfers to low bandwidth destinations, notably this only occurred with our initial design and later ceased to occur. 
+
+
+
+\section{Consensus experiment}
+We first investigate how many gossip rounds the blockchain protocol requires in order to converge.
+In blockchain systems, the time used for reaching consensus is decisive for performance, both in terms of throughput and latency.
+We commit blocks at fixed interval, hence, reaching consensus prior to the end of intervals does not increase performance, but indicates system stability.
+In our experiments, blocksize is set to 1 \gls{kb} as we want to mainly test our consensus scheme, and not maximize throughput.
+%From this experiment, we will observe if our system is stable with a 10 minute commit interval, either participants will be able to agree on each block within 10 minutes or diverge. 
+
+The results are shown in \autoref{fig:graph}, with the amount of participants on the x-axis and the amount of gossip rounds used to agree upon the next block on the y-axis.  
+We observed 23 fork blocks during the entire experiment.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{fig3.pdf}
+	\caption{The average amount of gossip rounds required to reach consensus on blocks, with a 10 minute commit interval. Error bars show the 95 percentile.}
+	\label{fig:graph}
+\end{figure}
+
+From our results, its clear that we are well within the 60 gossip round limit for convergence.
+This is due to our aggressive gossip rounds set to 10 seconds, and that we gossip with 2 peers in each round.
+We observe an increasing amount of rounds needed for convergence as we add more participants, which is to be expected.
+The graph does not follow a linear pattern, hence, gossip dissemination of our vote tables are not linearly correlated with our convergence time.
+FireChain scales well to 200 participants, and by the trend of the graph, probably scales well beyond that.
+As we only has access to 48 physical hosts, we did not conduct experiment with even more participants we leave this to future work. 
+
+
+As our epoch length is set to 10 minutes, and with 200 participants we currently use around 7-10 gossip rounds (1.5 minutes) to agree upon the next block, we could possibly reduce our epoch length.
+With rounds at 10 seconds, epochs could be pushed to around 2 minutes.
+Although, with a shorter time frame comes an increased chance of creating a fork due to higher probability of peers disagreeing.
+Essentially presenting a trade-off between system stability and commit latency.
+With more forks, participants will more frequently disagree on the current state of the distributed ledger.
+
+
+
+Throughout the entire experiment we observed 23 fork blocks, all of which only had either 1 or 2 votes.
+When peers temporarily become unavailable due to loss of network connectivity, they will simply progress their own local chain with their single vote.
+After rejoining the network and receiving update vote tables, they will detect a fork and resolve their branch with a random member of the majority.
+Hence, such forks live for the duration of the peer's network outage.
+
+ 
+
+%We also observe at 200 participants the standard deviation increase significantly.
+%After closer inspection, we noticed and increased occurrence of forks in our 200 peer experiment.
+%Of a total amount of 139 block forks across all experiment deployment, 121 of those fork blocks occurred during the 200 peer experiment.
+%When detecting a fork, peers try to contact another participant within the majority and adopt his chain.
+%However, this might occur while deciding the next block, resulting in longer convergence time for the current block.
+%As a result, when resolving a fork, peers require additional gossip rounds to decide the current block.
+
+%The reason for increased instability at 200 peers could have occurred for several reasons. 
+%As we are not the only one deploying applications on PlanetLab, we could have been disrupted by another deployment.
+%Also, as we experienced during development and testing, PlanetLab was quite unstable in terms of networking.
+%Hosts frequently changed from being available to unavailable.
+%Hence, peers could start the experiment, but frequently shift between being isolated, where in each isolation period would create their own local branch.
+%Another key detail from the 200 peers experiment was that the majority of forks appeared within the same time frame.
+%Therefore, we believe that a subset of our hosts was having network connectivity issues, as forks are directly related to hosts being isolated this seems plausible.
+ 
+
+
+\section{Block commit interval experiment}
+In the next experiment, we want to investigate if it is feasible to shorten epoch length.
+From the experiment described above, we observed that participants were able to agree upon a block on average before two minutes. 
+This experiment will therefore explore how well FireChain perform with 2 minute epochs.
+However, with shorter epochs the probability of forks increases.
+We will either observe similar results to our first experiment or participants will not be able to agree within 2 minutes and diverge.
+As we have a significant shorter time frame to reach consensus, we also expect to observe more forks.
+Blocksize is set to 1 \gls{kb} as we want to mainly test our consensus scheme, and not maximize throughput.
+
+
+The results is shown in \autoref{fig:graph2min}, with the amount of participants on the x-axis and the amount of gossip rounds used to agree upon the next block on the y-axis.
+We observed 217 fork blocks during the experiment.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{2minfig.pdf}
+	\caption{The average amount of gossip rounds to reach consensus on blocks, with a 2 minute commit interval. Error bars show the 95 percentile. }
+	\label{fig:graph2min}
+\end{figure}
+
+From our results, it is clear that participants are still able to agree upon blocks.
+We see an almost identical graph compared to experiment 1, hence, our system is still functioning as expected.
+However, we are creating significantly more forks compared to our first experiment, which is to be expected.
+This is due to the shorter time span in which peers have to agree upon blocks.
+If a peer becomes unavailable for two minutes, he has effectively missed an entire block selection. 
+We also observed longer lived forks, where separate vote partitions formed, these forks could live across several blocks.
+However, they were eventually resolved by our fork resolving scheme.
+This essentially presents a trade-off between fork frequency and block commit time.
+By committing blocks more frequently we reduce commit latencies, but we create more forks resulting increased system instability.
+Although we have showed the feasibility of running two minute commit intervals, a somewhat higher interval time might be sensible to account for various transient delays in the network.
+
+With more forks, entries are more probable to not be permanently committed due to being on a fork. 
+Bitcoin \cite{bitcoin} advises a 6 block rule with 10 minute block commit latencies, resulting in a total of 60 minutes latencies.
+We do not have \gls{pow}, hence, the main chain cannot be out-paced.
+Peers only have to be concerned about being apart of the majority.
+Hence, if a majority of all participants voted for a block, it is permanently committed.
+Unless an adversary gains control of the network majority, he is then capable of altering previous blocks as he holds a majority of votes.
+At the time of block committing, participants could prematurely detect that they are creating a fork by inspecting the amount of votes their favorite block has.
+If it is less than the majority, it is highly probable that the favorite block will become a fork.
+
+ 
+
+An alternative optimistic approach that could improve performance, would be to allow agreement within an epoch. 
+This would however require substantial change to the consensus mechanisms and require some changes to our fork resolving scheme.
+Instead of enforcing fixed time intervals for epochs, we could commit as we gained a majority for a block.
+Effectively committing whenever the network majority agree upon the next block, instead of waiting until the end of the current epoch.
+For example, if a network of 250 participants all voted for block \textit{b} at gossip round 8, they would effectively have to wait until the end of the epoch (gossip round 60) to commit the block.
+We could allow the network to commit blocks that are in practice agreed upon prior to the end of the current epoch, thereby committing agreed upon blocks earlier. 
+Participants that crash or are slow will simply fall behind have to catch up later.
+This approach introduces more instability and would need more investigating to determine if its a valid solution.
+However, we would eliminate our dead period between agreeing upon a block and waiting for the epoch to end.
+
+ 
+
+ 
+
+
+\section{Passive attack experiment}
+In this experiment we want to investigate how the system behaves when under attack.
+We instruct 30\% of participants to mount a passive attack, and still measure gossip rounds required for convergence as in the previous experiments.
+The goal here is to see if our system is capable of operating while under attack.
+Passive attackers still participate in the underlying Ifrit network, but do not participate in our consensus protocol and does not forward any FireChain gossip.
+Hence, attackers are attempting to disrupt the convergence process of honest participants.
+Attackers still deploy Ifrit clients, but do not subscribe to events in either the gossip or message service, they will therefore not receive any gossip or messages concerning FireChain consensus.
+
+
+The results is shown in \autoref{fig:pa_graph}, with the amount of participants on the x-axis and the amount of gossip rounds used to agree upon the next block on the y-axis.
+We observed 34 fork blocks during the experiment.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{passive_attack.pdf}
+	\caption{The average amount of gossip rounds to reach consensus on blocks, while under a passive attack. Error bars show the 95 percentile.  }
+	\label{fig:pa_graph}
+\end{figure}
+
+From the results we see that participants are still able to agree upon blocks despite the passive attack.
+We observe an increased amount of gossip rounds needed to reach consensus, but that is to be expected.
+The graph follows a clear linear pattern up until 120 clients, and afterwards varies.
+One possible reason for the difference in behavior is how attackers are positioned within Ifrit's ring mesh structure.
+Since each deployment produces its own pseudo-random ring mesh, attackers might be positioned in an inefficient attack manner.
+For example, if a high percentage of attackers are neighbors with the same honest participants, they can fully exclude them from participating in the consensus protocol.
+On the other hand if attackers are evenly distributed, honest participants will still receive consensus gossip, but in lower quantities.
+Additionally, if attackers are neighbors they effectively waste an attack opportunity by affecting less honest participants' gossip patterns. 
+
+
+
+Surprisingly, we do not generate a significant amount of fork blocks.
+In experiment 1 we generated 23 fork blocks, while under attack we produce 34.
+As attackers are effectively slowing down consensus progress, we expected even more forks to be created due to disagreement.
+This might be related to the same scenarios as we explained previously, however, as fork blocks are accumulated throughout all experiment deployments, its seems highly unlikely.
+We attribute this attack resiliences to Ifrit's gossip service.
+With Ifrit's ring mesh, participants are highly probable to have at least one honest neighbor and will thereby receive consensus gossip.
+
+
+
+
+\section{Block size experiment}
+In this experiment we want to test FireChain with 10 \gls{kb} blocks and see if participants still reach agreement within epoch time frames.
+Previous experiments were conducted with 1 \gls{kb} blocks, mainly to test our consensus mechanism.
+As disseminating larger blocks requires more bandwidth and time, participants might not reach agreement within epochs.
+Also, our vote tables will be significantly affected due to blocks having more entries, since we store block entry hashes in each vote table entry.
+Thereby, not only will block dissemination be affected, but also our vote tables that control our consensus mechanism.
+ 
+
+The results is shown in \autoref{fig:blocksize}, with the amount of participants on the x-axis and the amount of gossip rounds used to agree upon the next block on the y-axis.
+We observed 34 fork blocks during the experiment.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{10k.pdf}
+	\caption{The average amount of gossip rounds to reach consensus on 10 \gls{kb} blocks.
+		Error bars show the 95 percentile.  }
+	\label{fig:blocksize}
+\end{figure}
+
+From our results we see that participants are still able to agree upon blocks, and follows a similar scaling pattern as our previous experiments.
+However, we observe that at 20 and especially 100 participants, our results indicate system instability.
+After closer inspection we discovered that PlanetLab had capped bandwidth usage of some of our hosts due to excessive network traffic.
+Thereby resulting in slower dissemination of vote tables and blocks for some hosts, subsequently slowing the down our consensus protocol.
+As we extract the highest gossip round number per block, the slowest participants will determine when the system agreed upon blocks.
+Thus, we argue that the instability at 20 and 100 participants were due to some hosts having the bandwidth capped.
+Although, it is interesting that our bandwidth was not capped with 200 participants, as we use more bandwidth the more peers present in the network. 
+
+
+We initially intended to set our blocksize to 1 \gls{mb}, as in Bitcoin.
+However, after testing our implementation on PlanetLab, we discovered that nodes had insufficient bandwidth to disseminate blocks of that size.
+This was mainly due to our gossip approach, where all entry hashes associated with a block are stored in vote tables entries. 
+Hence, as we increase block sizes, our vote table entries contain more hashes, subsequently consuming more bandwidth.
+Resolving forks and disseminating blocks also consumes more bandwidth with higher block sizes.
+Also, the minimum bandwidth requirement of PlanetLab nodes are 400 \gls{kbps} which we deem quite low, and has a maximum bandwidth usage limit of 10 \gls{gb} per day.
+
+If we separate our voting mechanism from our block entry dissemination, we could effectively agree upon blocks of arbitrary size.
+More specifically, we could remove block entry hashes from vote table entries, only identifying blocks from their root hash and previous hash.
+However, we would need another approach for coupling blocks with their respective content.
+Participants could potentially start disseminating block content after receiving sufficiently amounts of votes for their block, thereby shrinking the size of our vote tables significantly, and eliminating unnecessary block entry dissemination.
+With this approach participants could agree upon blocks without having received all of its content, possibly committing blocks with invalid content, which subsequently increases fork frequency.
+This approach or other alternatives should be explored in future work to further improve performance.   
+
+
+
+
+ 
+\iffalse
+\section{Experiment 4}
+\subsection{Setup}
+The chain of events during each instance of the experiment is described in \autoref{exp4step}.
+\begin{description}\label{exp4step}
+	\item[Step 4] Start experiment, FireChain instances starts generating blocks and the entire chain starts progressing. Participants commit blocks at 10 minute intervals.
+	\item[Step 5] Instruct 30\% of participants to perform an aggressive attack.
+	\item[Step 6] Let the chain progress 50 blocks.
+\end{description}
+		
+\subsection{Observations}
+%\begin{figure}[h]
+%	\centering
+%	\includegraphics[scale=0.6]{fig3.pdf}
+%	\caption{Interaction with Ifrit?.}
+%	\label{fig:graph}
+%\end{figure}
+		
+\subsection{Discussion}
+\fi
+
+
+
+
+
+
+
+
+
+\iffalse
+\section{Discussion}
+
+\subsection{Throughput \& Latency}
+Our theoretical latency for committing entries is equal to our block commit intervals.
+By default our interval is set to 10 minutes, same as Bitcoin, but we have shown the feasibility of lowering it which in turn lowers our entry commit latency.
+However, with lower commit intervals we produce more forks, and thus invalidate all entries contained in the forked blocks.
+Throughput is directly linked to commit intervals, block size, and entry size.
+By default we have a block size of 1 megabyte and entry size of 300 bytes, fitting around 3300 entries per block.
+As a result, our theoretical throughput is around 5.5 entries per minute with a 10 minute commit interval.
+Lowering our commit interval to 2 minutes give us a theoretical throughput around 27.5 entries per minute.
+As FireChain have no entry content, and thus no entry validation, throughput and latencies are only theoretical and experiments should be conduced with actual content in future work.
+Additionally, as our system is a proof-of-concept implementation with the goal of showing that its feasible to build a blockchain on gossip, performance is not our main concern. 
+
+%\subsection{Comparison to other consensus mechanism?}
+
+
+   
+    
+%\subsection{Block size}
+% agree upon block... same as with large and little etc
+ 
+
+
+Currently, all entry hashes associated with a block is stored in vote table entries, such that participants can identify which block entries belongs to each block.
+However, as we increase the block size, the amount of content in each block increases.
+Subsequently, more hashes are stored in each vote entry, eventually consuming excessive amounts of bandwidth.
+If we separate our voting mechanism from our block entry dissemination, we could effectively agree upon blocks of arbitrary size.
+More specifically, we could remove block entry hashes from vote table entries, only identifying blocks from their root hash and previous hash.
+However, we would need another approach for coupling blocks with their respective content.
+Additionally, blocks might be populated with content after agreeing upon the block itself, hence, peers could agree upon a block with invalid content.
+ 
+
+
+\subsection{Fireflies}
+
+With another scheme to resist Sybil attack, Fireflies could be deployed without a trusted \gls{ca}.
+Bitcoin resists Sybil attacks by employing \gls{pow}, and we argue that Bitcoin combined with Fireflies would be a perfect fit.
+As mentioned earlier, participants in Bitcoin where advertising 16000 live peers, while only 3500 where reachable \cite{propa}.
+Fireflies is, as of our knowledge, the only full membership protocol able to scale to that extent.
+With Fireflies as the underlying membership service, Bitcoin participants would have an updated live view at all times.
+Also, they could employ the same approach we did with FireChain, use Fireflies neighbors to disseminate gossip, instead of selecting random peers from the full view.
+%Deploying an experiment with Bitcoin clients running Ifrit as their underling membership and gossip service would be an  
+
+
+ 
+%planetlab shizzle
+
+
+% Vetta faen om vi treng det her
+%\subsection{Permissionless \& permissioned deployment}
+%Ifrit conducts all communication between Firechain instances, and is responsible for maintaining \gls{tls} connections.  
+%Ifrit can be deployed either with \gls{ca} who signs all certificates, or with self signed certificates.
+%Without a \gls{ca} the system becomes vulnerable to Sybil attacks \cite{sybil}, but allows for permissionless deployment.
+%One could also accept certificates that are signed by any \gls{ca} to achieve this.
+%In permissioned deployment, Ifrit could regulate participation by regulating which certificates are accepted.
+
+\fi
+
+\chapter{Conclusion}\label{chap:conclusion}
+In this chapter we will explore future work related to FireChain and Ifrit, and conclude the thesis.
+
+
+\section{Future work}
+For FireChain future work consists of two main points; entry content and storage.
+As of now, entries contain random data, this was mainly due to FireChain being a proof-of-concept implementation.
+We envisage that FireChain can provide a generic interface where applications can define how transactions are validated, processed etc.
+Thereby, supporting any application specified transaction or data fulfilling our interface.
+We deem adding storage a trivial matter.
+Also, our fork resolving scheme has not been formally verified for correctness, and there might be attack vectors that we have not addressed.
+
+We want to do a full resource evaluation of Ifrit from memory usage to bandwidth, also when under attack.
+The original Fireflies \cite{flies}, did experiments to evaluate how much extra network traffic an adversary could create by performing both passive and active attacks.
+However, those experiments were performed with the old implementation and in the future would like to repeated similar experiments with the new one.
+Both to ensure validity and performance.
+We also have a different gossip approach compared to the old implementation. 
+
+Our experiments were conducted with a total of 48 physical hosts, where multiple clients were deployed on each host.  
+In future work, larger scale should be done, conducting experiments at the scale of the Bitcoin network would be desirable.
+As we are confident in the scalability of Ifrit, experiments with over 3000 physical hosts would be an impressive feat.
+Also, conducting experiments in a high performance environment would be an interesting comparison to our current environment on PlanetLab, where nodes have a minimum bandwidth requirement of 400 \gls{kbps}.   
+  
+  
+\section{Concluding remarks}
+Our thesis was that:
+\begin{quote}
+	%\textit{Implement and evaluate a proof-of-concept blockchain based on gossip, and implement the Fireflies protocol as its underlying networking substrate.}
+	\textit{An efficient and scalable blockchain can be built using a byzantine fault-tolerant gossip service.}
+\end{quote}
+We have successfully implemented a \gls{bft} gossip and membership service, namely Ifrit, based on the Fireflies protocol. 
+In general, we believe Ifrit provides a beneficial membership service for blockchain systems.
+\gls{pow} chains can utilize Ifrit without a \gls{ca} and take advantage of the full membership view.
+\gls{pos} and \gls{bft} chains can deploy Ifrit with a \gls{ca} for a full Sybil resistant membership view.
+Subsequently, we used Ifrit to design and implement a blockchain based on a consensus mechanism relying on gossip, namely FireChain.
+From our results we have shown the feasibility and scalability of FireChain which operates without \gls{pow}, hence, consuming low amounts of energy.
+
+
+
+\iffalse
+We have succesfully implemented, tested and evaluated a proof-of-concept blockchain based on the protocol \cite{vanblock}, with Fireflies as its underlying network substrate.
+Our design revolves around using gossip as a blockchain's consensus mechanism. 
+From our results we show the feasibility of using Fireflies as a membership and gossip service in a blockchain context.
+Finally, the protocol \cite{vanblock} has shown to be feasible in a highly distributed environment as a blockchain consensus mechanism.
+\fi
+ 
+
+
+
+
+
+\bibliographystyle{ieeetr}
+
+\bibliography{sources}
+
+
+\backmatter
+
+\end{document}
+
